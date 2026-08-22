@@ -201,9 +201,9 @@
             <ul class="sidebar-menu">
                 <li><a href="/">Home</a></li>
                 <li><a href="/verification" class="active">Verification</a></li>
-                <li><a href="/ocean-one/" class="active"> Ocean One Bot</a></li>
-                <li><a href="/beacon" class="active">Beacon</a></li>
-                <li><a href="https://discord.gg/UdAKT57TK9" target="_blank">Discord Server</a></li>
+                <li><a href="/ocean-one/">Ocean One Bot</a></li>
+                <li><a href="/beacon">Beacon</a></li>
+                <li><a href="https://discord.gg/UdAKT57TK9" target="_blank" rel="noopener noreferrer">Discord Server</a></li>
             </ul>
             <div class="sidebar-footer">
                 &copy; 2026 OceanWorks
@@ -214,7 +214,7 @@
             <div class="content-container">
                 <h1 id="status-title">Roblox Verification</h1>
                 <p id="status-desc">Link your Roblox account securely using OpenID authentication to verify your profile with OceanWorks.</p>
-                
+
                 <div id="action-area" class="cta-buttons">
                     <a href="#" id="roblox-login-btn" class="btn">🔗 Link Roblox Account</a>
                 </div>
@@ -231,50 +231,130 @@
     </div>
 
     <script>
-        // CHANGE THIS URL when you switch from local testing to AWS:
-        const BACKEND_URL = 'http://localhost:3000/api/verify';
+        /*
+         * Production backend.
+         *
+         * IMPORTANT:
+         * 51.161.42.156:2597 is the server allocation you provided.
+         * The backend must actually be running on that allocation.
+         *
+         * If your hosting provider gives you an HTTPS domain for the backend,
+         * use that HTTPS URL here instead. An HTTPS GitHub Pages site may
+         * block plain HTTP API requests as mixed content.
+         */
+        const BACKEND_URL = 'http://51.161.42.156:2597/api/verify';
 
-        // Grab URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const authCode = urlParams.get('code');
         const discordUserId = urlParams.get('discordId');
+        const returnedDiscordId = urlParams.get('state');
 
         const clientId = "6144543399746861341";
         const redirectUri = "https://ocean-works.github.io/verification";
 
-        if (authCode) {
-            // Case 1: User returned from Roblox with an authorization code
-            document.getElementById('status-title').innerText = "Processing Verification...";
-            document.getElementById('status-desc').innerText = "Authenticating your Roblox account data, please wait...";
-            document.getElementById('action-area').style.display = 'none';
-            
-            // Note: Roblox passes back the discord ID via the 'state' query parameter we set during login
-            const returnedDiscordId = urlParams.get('state');
+        function setStatus(title, description, showButton = false) {
+            document.getElementById('status-title').innerText = title;
+            document.getElementById('status-desc').innerText = description;
+            document.getElementById('action-area').style.display = showButton ? 'block' : 'none';
+        }
 
-            fetch(`${BACKEND_URL}?code=${authCode}&state=${returnedDiscordId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('status-title').innerText = "Success!";
-                        document.getElementById('status-desc').innerText = data.message;
-                    } else {
-                        document.getElementById('status-title').innerText = "Verification Failed";
-                        document.getElementById('status-desc').innerText = data.message;
+        async function processVerification() {
+            setStatus(
+                "Processing Verification...",
+                "Authenticating your Roblox account data, please wait..."
+            );
+
+            try {
+                if (!returnedDiscordId) {
+                    throw new Error("Missing Discord user ID in OAuth state.");
+                }
+
+                if (!authCode) {
+                    throw new Error("Missing Roblox authorization code.");
+                }
+
+                const verifyUrl = new URL(BACKEND_URL);
+                verifyUrl.searchParams.set('code', authCode);
+                verifyUrl.searchParams.set('state', returnedDiscordId);
+
+                const response = await fetch(verifyUrl.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('status-title').innerText = "Connection Error";
-                    document.getElementById('status-desc').innerText = "Could not reach the backend server.";
                 });
+
+                const contentType = response.headers.get('content-type') || '';
+                let data = {};
+
+                if (contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error(
+                        `Backend returned HTTP ${response.status} instead of JSON: ${text.slice(0, 200)}`
+                    );
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || `Backend returned HTTP ${response.status}.`);
+                }
+
+                if (data.success) {
+                    setStatus(
+                        "Success!",
+                        data.message || "Your Roblox account has been successfully verified."
+                    );
+                } else {
+                    setStatus(
+                        "Verification Failed",
+                        data.message || data.error || "The backend could not verify your Roblox account."
+                    );
+                }
+            } catch (error) {
+                console.error("[OceanWorks Verification]", error);
+
+                setStatus(
+                    "Connection Error",
+                    `Could not complete verification. ${error.message || "The backend server could not be reached."}`
+                );
+            }
+        }
+
+        function startRobloxLogin() {
+            const targetDiscordId = discordUserId;
+
+            if (!targetDiscordId) {
+                setStatus(
+                    "Discord ID Required",
+                    "Open the verification link from Discord so your Discord account can be linked.",
+                    true
+                );
+                return;
+            }
+
+            const robloxAuthUrl = new URL(
+                'https://apis.roblox.com/oauth/v1/authorize'
+            );
+
+            robloxAuthUrl.searchParams.set('client_id', clientId);
+            robloxAuthUrl.searchParams.set('redirect_uri', redirectUri);
+            robloxAuthUrl.searchParams.set('response_type', 'code');
+            robloxAuthUrl.searchParams.set('scope', 'openid profile');
+            robloxAuthUrl.searchParams.set('state', targetDiscordId);
+
+            window.location.href = robloxAuthUrl.toString();
+        }
+
+        document.getElementById('roblox-login-btn').addEventListener('click', function(event) {
+            event.preventDefault();
+            startRobloxLogin();
+        });
+
+        if (authCode) {
+            processVerification();
         } else {
-            // Case 2: User opened the page normally (either via website button or bot link)
-            const targetDiscordId = discordUserId || "UNKNOWN_USER";
-            
-            // Build the Roblox OAuth link embedding the Discord ID inside 'state'
-            const robloxAuthUrl = `https://apis.roblox.com/oauth/v1/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid+profile&state=${targetDiscordId}`;
-            
-            document.getElementById('roblox-login-btn').href = robloxAuthUrl;
+            document.getElementById('action-area').style.display = 'block';
         }
     </script>
 </body>
