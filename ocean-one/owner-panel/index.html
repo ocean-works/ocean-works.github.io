@@ -472,7 +472,7 @@
 
     <script>
         const CLIENT_ID = '1530208568392028302'; 
-        const BACKEND_URL = 'http://localhost:3000'; 
+        const BACKEND_URL = 'http://51.161.42.156:2597'; 
         
         let REDIRECT_URI;
         const currentHost = window.location.hostname;
@@ -574,20 +574,64 @@
             const selectedGuild = userGuildsData.find(g => g.id === currentSelectedGuildId);
 
             try {
-                const res = await fetch(`${BACKEND_URL}/api/guilds/${currentSelectedGuildId}/channels`);
-                if (res.ok) {
-                    const data = await res.json();
-                    serverChannels = data.channels;
-                    serverCategories = data.categories || [];
-                    serverRoles = data.roles || [];
-                    isCurrentServerPlus = data.isPlus;
+                const res = await fetch(
+                    `${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/channels`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+
+                if (!res.ok) {
+                    const errorText = await res.text().catch(() => '');
+                    throw new Error(
+                        `Backend returned HTTP ${res.status}${errorText ? `: ${errorText}` : ''}`
+                    );
                 }
+
+                const data = await res.json();
+
+                if (!Array.isArray(data.channels)) {
+                    throw new Error('Backend response is missing a valid channels array.');
+                }
+
+                serverChannels = data.channels;
+                serverCategories = Array.isArray(data.categories) ? data.categories : [];
+                serverRoles = Array.isArray(data.roles) ? data.roles : [];
+
+                // The backend is responsible for reading plus.json and returning
+                // whether THIS guild has Ocean+.
+                isCurrentServerPlus = data.isPlus === true;
+
+                console.log(
+                    `[Ocean One] ${selectedGuild?.name || currentSelectedGuildId}:`,
+                    {
+                        channels: serverChannels.length,
+                        categories: serverCategories.length,
+                        roles: serverRoles.length,
+                        isPlus: isCurrentServerPlus
+                    }
+                );
             } catch (e) {
-                console.warn("Could not reach backend API for channels. Using fallback.", e);
-                serverChannels = [{ id: 'fallback_1', name: 'ocean-one' }];
+                console.error("Could not load server data from Ocean One backend:", e);
+
+                // Do not silently fake an ocean-one channel or mark the server
+                // as non-Plus. That was hiding the actual backend problem.
+                serverChannels = [];
                 serverCategories = [];
                 serverRoles = [];
                 isCurrentServerPlus = false;
+
+                alert(
+                    "Ocean One could not connect to the backend.\n\n" +
+                    `Backend: ${BACKEND_URL}\n` +
+                    `Error: ${e.message}\n\n` +
+                    "Make sure the Ocean One server is running and the backend " +
+                    "is listening on port 2597."
+                );
+                return;
             }
 
             if (selectedGuild) {
@@ -736,9 +780,15 @@
             const defaultChannelQuery = 'ocean-one';
 
             let channelOptionsHtml = serverChannels.map(c => {
-                const isDefault = c.name.toLowerCase() === defaultChannelQuery ? 'selected' : '';
-                return `<option value="${c.id}" ${isDefault}>#${c.name}</option>`;
+                const channelName = String(c.name || '');
+                const channelId = String(c.id || '');
+                const isDefault = channelName.toLowerCase() === defaultChannelQuery ? 'selected' : '';
+                return `<option value="${channelId}" ${isDefault}>#${channelName}</option>`;
             }).join('');
+
+            if (!channelOptionsHtml) {
+                channelOptionsHtml = '<option value="" disabled selected>No channels returned by backend</option>';
+            }
 
             if (moduleKey === 'ticket_panel') {
                 modalTitle.innerText = 'Send Ticket Panel';
@@ -760,7 +810,7 @@
 
                 let current = { types: [], staffRoleId: null, categoryId: null, limit: 4, isPlus: false };
                 try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${currentSelectedGuildId}/tickets`);
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets`);
                     if (res.ok) current = await res.json();
                 } catch (e) {
                     console.warn('Could not load ticket configuration.', e);
@@ -794,7 +844,7 @@
 
                 let current = { channelId: null, hostRoleIds: [] };
                 try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${currentSelectedGuildId}/sessions`);
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/sessions`);
                     if (res.ok) current = await res.json();
                 } catch (e) {
                     console.warn('Could not load session configuration.', e);
@@ -897,7 +947,7 @@
                 const channelId = document.getElementById('cfg-panel-channel').value;
                 const selectedGuild = userGuildsData.find(g => g.id === currentSelectedGuildId);
                 try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${currentSelectedGuildId}/tickets/panel`, {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets/panel`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ channelId, guildName: selectedGuild ? selectedGuild.name : undefined })
@@ -922,7 +972,7 @@
                 const staffRoleId = document.getElementById('cfg-ticket-staffrole').value || null;
                 const categoryId = document.getElementById('cfg-ticket-category').value || null;
                 try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${currentSelectedGuildId}/tickets`, {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ types, staffRoleId, categoryId })
@@ -946,7 +996,7 @@
                 const roleSelect = document.getElementById('cfg-session-roles');
                 const hostRoleIds = Array.from(roleSelect.selectedOptions).map(o => o.value);
                 try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${currentSelectedGuildId}/sessions`, {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/sessions`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ channelId, hostRoleIds })
@@ -984,7 +1034,7 @@
             }
 
             try {
-                const res = await fetch(`${BACKEND_URL}/api/guilds/${currentSelectedGuildId}/config`, {
+                const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ moduleKey: activeConfigModule, configData })
