@@ -472,7 +472,7 @@
 
     <script>
         const CLIENT_ID = '1530208568392028302'; 
-        const BACKEND_URL = 'https://legibly-getaway-demote.ngrok-free.dev';
+        const BACKEND_URL = 'https://soft-humans-worry.loca.lt'; // Updated to use localtunnel
         const NGROK_HEADERS = { 'ngrok-skip-browser-warning': 'true' };
         
         let REDIRECT_URI;
@@ -581,7 +581,7 @@
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
-                            ...NGROK_HEADERS
+                            'Bypass-Tunnel-Reminder': 'true' // Bypasses localtunnel warning screen
                         }
                     }
                 );
@@ -616,8 +616,8 @@
                     "Ocean One could not connect to the backend.\n\n" +
                     `Backend: ${BACKEND_URL}\n` +
                     `Error: ${e.message}\n\n` +
-                    "Make sure the Ocean One server is running and the backend " +
-                    "is listening on port 2597."
+                    "Make sure the Ocean One server is running and localtunnel " +
+                    "is active on port 2597."
                 );
                 return;
             }
@@ -798,7 +798,7 @@
                 let current = { types: [], staffRoleId: null, categoryId: null, limit: 4, isPlus: false };
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets`, {
-                        headers: { ...NGROK_HEADERS }
+                        headers: { 'Bypass-Tunnel-Reminder': 'true' }
                     });
                     if (res.ok) current = await res.json();
                 } catch (e) {
@@ -834,7 +834,7 @@
                 let current = { channelId: null, hostRoleIds: [] };
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/sessions`, {
-                        headers: { ...NGROK_HEADERS }
+                        headers: { 'Bypass-Tunnel-Reminder': 'true' }
                     });
                     if (res.ok) current = await res.json();
                 } catch (e) {
@@ -940,7 +940,7 @@
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets/panel`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                        headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
                         body: JSON.stringify({ channelId, guildName: selectedGuild ? selectedGuild.name : undefined })
                     });
                     const data = await res.json().catch(() => ({}));
@@ -965,7 +965,7 @@
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                        headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
                         body: JSON.stringify({ types, staffRoleId, categoryId })
                     });
                     const data = await res.json().catch(() => ({}));
@@ -989,7 +989,7 @@
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/sessions`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                        headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
                         body: JSON.stringify({ channelId, hostRoleIds })
                     });
                     const data = await res.json().catch(() => ({}));
@@ -1027,7 +1027,7 @@
             try {
                 const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                    headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
                     body: JSON.stringify({ moduleKey: activeConfigModule, configData })
                 });
 
