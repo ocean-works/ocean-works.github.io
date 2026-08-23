@@ -387,8 +387,6 @@
             .content-container { padding: 30px 20px; }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
 </head>
 <body>
     <div class="top-bar"></div>
@@ -619,7 +617,7 @@
                     }
                 );
             } catch (e) {
-                console.error("Could not load server data from Ocean One backend:", e);
+                console.error("Could not load server data from Ocean One backend:", e, `(${BACKEND_URL})`);
 
                 // Do not silently fake an ocean-one channel or mark the server
                 // as non-Plus. That was hiding the actual backend problem.
@@ -629,11 +627,8 @@
                 isCurrentServerPlus = false;
 
                 alert(
-                    "Ocean One could not connect to the backend.\n\n" +
-                    `Backend: ${BACKEND_URL}\n` +
-                    `Error: ${e.message}\n\n` +
-                    "Make sure the Ocean One server is running and the backend " +
-                    "is listening on port 2597."
+                    "Ocean One couldn't connect right now.\n\n" +
+                    "Please try again in a moment. If this keeps happening, let the server owner know."
                 );
                 return;
             }
