@@ -42,7 +42,7 @@
             margin-top: 6px;
         }
 
-        sidebar {
+        .app-sidebar {
             width: var(--sidebar-width);
             background-color: var(--card-bg);
             border-right: 1px solid var(--border-color);
@@ -382,7 +382,7 @@
         }
 
         @media (max-width: 768px) {
-            sidebar { display: none; }
+            .app-sidebar { display: none; }
             .main-content { margin-left: 0; padding: 20px; }
             .content-container { padding: 30px 20px; }
         }
@@ -393,7 +393,7 @@
 
     <div class="app-layout">
         <!-- Sidebar Navigation -->
-        <sidebar>
+        <aside class="app-sidebar">
             <div class="sidebar-brand">
                 Ocean <span>Works</span>
             </div>
@@ -406,7 +406,7 @@
                 <a class="logout-link hidden" id="logout-btn" onclick="logoutSession()">Logout / Switch Account</a>
                 <div>&copy; 2026 OceanWorks</div>
             </div>
-        </sidebar>
+        </aside>
 
         <!-- Main Content Area -->
         <div class="main-content">
@@ -602,25 +602,11 @@
                 serverChannels = data.channels;
                 serverCategories = Array.isArray(data.categories) ? data.categories : [];
                 serverRoles = Array.isArray(data.roles) ? data.roles : [];
-
-                // The backend is responsible for reading plus.json and returning
-                // whether THIS guild has Ocean+.
                 isCurrentServerPlus = data.isPlus === true;
 
-                console.log(
-                    `[Ocean One] ${selectedGuild?.name || currentSelectedGuildId}:`,
-                    {
-                        channels: serverChannels.length,
-                        categories: serverCategories.length,
-                        roles: serverRoles.length,
-                        isPlus: isCurrentServerPlus
-                    }
-                );
             } catch (e) {
                 console.error("Could not load server data from Ocean One backend:", e);
 
-                // Do not silently fake an ocean-one channel or mark the server
-                // as non-Plus. That was hiding the actual backend problem.
                 serverChannels = [];
                 serverCategories = [];
                 serverRoles = [];
@@ -660,7 +646,6 @@
             const container = document.getElementById('modules-container');
             container.innerHTML = '';
 
-            // Master list of all modules, marking which ones require Ocean+
             const allModules = [
                 {
                     key: 'antinuke',
