@@ -871,71 +871,112 @@
 
             if (moduleKey === 'customization') {
                 modalTitle.innerText = 'Ocean+ Per-Server Bot Profile';
+                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
+                document.getElementById('config-modal').classList.remove('hidden');
+
+                let saved = {};
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
+                        headers: { ...NGROK_HEADERS }
+                    });
+                    if (res.ok) saved = (await res.json()).customization || {};
+                } catch (e) {
+                    console.warn('Could not load customization configuration.', e);
+                }
+
                 modalBody.innerHTML = `
                     <div class="form-group">
                         <label>Custom Server Nickname</label>
-                        <input type="text" id="cfg-nickname" value="Ocean One">
+                        <input type="text" id="cfg-nickname" value="${saved.nickname || 'Ocean One'}">
                     </div>
                     <div class="form-group">
                         <label>Custom Profile Picture URL</label>
-                        <input type="text" id="cfg-avatar" placeholder="https://example.com/avatar.png">
+                        <input type="text" id="cfg-avatar" value="${saved.avatarUrl || ''}" placeholder="https://example.com/avatar.png">
                     </div>
                     <div class="form-group">
                         <label>Custom Banner URL</label>
-                        <input type="text" id="cfg-banner" placeholder="https://example.com/banner.png">
+                        <input type="text" id="cfg-banner" value="${saved.bannerUrl || ''}" placeholder="https://example.com/banner.png">
                     </div>
                     <div class="form-group">
                         <label>Custom Bio / About Me</label>
-                        <textarea id="cfg-bio" rows="2" placeholder="Custom bot bio for this server..."></textarea>
+                        <textarea id="cfg-bio" rows="2" placeholder="Custom bot bio for this server...">${saved.bio || ''}</textarea>
                     </div>
+                    <p style="color: var(--text-muted); font-size: 13px;">Only the nickname is actually applied to the bot — Discord doesn't support a per-server bot avatar or banner, so those fields are saved but not enforced.</p>
                 `;
-            } else if (moduleKey === 'antinuke' || moduleKey === 'antinuke-plus') {
-                modalTitle.innerText = moduleKey === 'antinuke-plus' ? 'Configure Advanced Anti-Nuke' : 'Configure Anti-Nuke';
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Target Channel</label>
-                        <select id="cfg-channel">${channelOptionsHtml}</select>
-                    </div>
-                    <div class="form-group">
-                        <label>Max Deletions Threshold</label>
-                        <input type="text" id="cfg-threshold" value="3">
-                    </div>
-                `;
-            } else if (moduleKey === 'antispam') {
-                modalTitle.innerText = 'Configure Anti-Spam';
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Target Channel</label>
-                        <select id="cfg-channel">${channelOptionsHtml}</select>
-                    </div>
-                    <div class="form-group">
-                        <label>Action</label>
-                        <select id="cfg-action">
-                            <option value="delete">Delete Message</option>
-                            <option value="timeout">Timeout Member</option>
-                        </select>
-                    </div>
-                `;
-            } else if (moduleKey === 'verification') {
-                modalTitle.innerText = 'Configure Verification';
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Target Channel</label>
-                        <select id="cfg-channel">${channelOptionsHtml}</select>
-                    </div>
-                    <div class="form-group">
-                        <label>Role to Grant on Success</label>
-                        <input type="text" id="cfg-role" value="Verified">
-                    </div>
-                `;
-            } else if (moduleKey === 'logs') {
-                modalTitle.innerText = 'Configure Extended Logs';
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Target Channel</label>
-                        <select id="cfg-channel">${channelOptionsHtml}</select>
-                    </div>
-                `;
+                return;
+            }
+
+            if (['antinuke', 'antinuke-plus', 'antispam', 'verification', 'logs'].includes(moduleKey)) {
+                modalTitle.innerText = 'Loading...';
+                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
+                document.getElementById('config-modal').classList.remove('hidden');
+
+                let saved = {};
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
+                        headers: { ...NGROK_HEADERS }
+                    });
+                    if (res.ok) saved = (await res.json())[moduleKey] || {};
+                } catch (e) {
+                    console.warn(`Could not load ${moduleKey} configuration.`, e);
+                }
+
+                const savedChannelOptionsHtml = serverChannels.map(c => {
+                    const channelName = String(c.name || '');
+                    const channelId = String(c.id || '');
+                    const isSelected = channelId === saved.channelId ? 'selected' : (!saved.channelId && channelName.toLowerCase() === defaultChannelQuery ? 'selected' : '');
+                    return `<option value="${channelId}" ${isSelected}>#${channelName}</option>`;
+                }).join('') || '<option value="" disabled selected>No channels returned by backend</option>';
+
+                if (moduleKey === 'antinuke' || moduleKey === 'antinuke-plus') {
+                    modalTitle.innerText = moduleKey === 'antinuke-plus' ? 'Configure Advanced Anti-Nuke' : 'Configure Anti-Nuke';
+                    modalBody.innerHTML = `
+                        <div class="form-group">
+                            <label>Target Channel</label>
+                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Deletions Threshold</label>
+                            <input type="text" id="cfg-threshold" value="${saved.threshold || '3'}">
+                        </div>
+                    `;
+                } else if (moduleKey === 'antispam') {
+                    modalTitle.innerText = 'Configure Anti-Spam';
+                    modalBody.innerHTML = `
+                        <div class="form-group">
+                            <label>Target Channel</label>
+                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>Action</label>
+                            <select id="cfg-action">
+                                <option value="delete" ${saved.action === 'delete' || !saved.action ? 'selected' : ''}>Delete Message</option>
+                                <option value="timeout" ${saved.action === 'timeout' ? 'selected' : ''}>Timeout Member</option>
+                            </select>
+                        </div>
+                    `;
+                } else if (moduleKey === 'verification') {
+                    modalTitle.innerText = 'Configure Verification';
+                    modalBody.innerHTML = `
+                        <div class="form-group">
+                            <label>Target Channel</label>
+                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>Role to Grant on Success</label>
+                            <input type="text" id="cfg-role" value="${saved.role || 'Verified'}">
+                        </div>
+                    `;
+                } else if (moduleKey === 'logs') {
+                    modalTitle.innerText = 'Configure Extended Logs';
+                    modalBody.innerHTML = `
+                        <div class="form-group">
+                            <label>Target Channel</label>
+                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
+                        </div>
+                    `;
+                }
+                return;
             }
 
             document.getElementById('config-modal').classList.remove('hidden');
