@@ -229,133 +229,284 @@
             </footer>
         </div>
     </div>
+  <script>
+    const BACKEND_URL = 'https://legibly-getaway-demote.ngrok-free.dev/api/verify/';
 
-    <script>
-        /*
-         * Production backend.
-         *
-         * IMPORTANT:
-         * 51.161.42.156:2597 is the server allocation you provided.
-         * The backend must actually be running on that allocation.
-         *
-         * If your hosting provider gives you an HTTPS domain for the backend,
-         * use that HTTPS URL here instead. An HTTPS GitHub Pages site may
-         * block plain HTTP API requests as mixed content.
-         */
-        const BACKEND_URL = 'https://legibly-getaway-demote.ngrok-free.dev/api/verify/';
+    const DISCORD_CLIENT_ID = '6144543399746861341';
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const authCode = urlParams.get('code');
-        const discordUserId = urlParams.get('discordId');
-        const returnedDiscordId = urlParams.get('state');
+    const DISCORD_REDIRECT_URI =
+        'https://ocean-works.github.io/verification';
 
-        const clientId = "6144543399746861341";
-        const redirectUri = "https://ocean-works.github.io/verification";
+    const urlParams = new URLSearchParams(window.location.search);
 
-        function setStatus(title, description, showButton = false) {
-            document.getElementById('status-title').innerText = title;
-            document.getElementById('status-desc').innerText = description;
-            document.getElementById('action-area').style.display = showButton ? 'block' : 'none';
+    const authCode = urlParams.get('code');
+
+    let discordUserId = urlParams.get('discordId');
+
+    const returnedDiscordId = urlParams.get('state');
+
+    const clientId = "6144543399746861341";
+
+    const redirectUri =
+        "https://ocean-works.github.io/verification";
+
+    function setStatus(title, description, showButton = false) {
+        document.getElementById('status-title').innerText = title;
+        document.getElementById('status-desc').innerText = description;
+        document.getElementById('action-area').style.display =
+            showButton ? 'block' : 'none';
+    }
+
+    function loginWithDiscord() {
+        const discordUrl = new URL(
+            'https://discord.com/oauth2/authorize'
+        );
+
+        discordUrl.searchParams.set(
+            'client_id',
+            DISCORD_CLIENT_ID
+        );
+
+        discordUrl.searchParams.set(
+            'redirect_uri',
+            DISCORD_REDIRECT_URI
+        );
+
+        discordUrl.searchParams.set(
+            'response_type',
+            'token'
+        );
+
+        discordUrl.searchParams.set(
+            'scope',
+            'identify'
+        );
+
+        window.location.href = discordUrl.toString();
+    }
+
+    async function getDiscordUser() {
+        const hashParams = new URLSearchParams(
+            window.location.hash.substring(1)
+        );
+
+        const accessToken =
+            hashParams.get('access_token');
+
+        if (!accessToken) {
+            return null;
         }
 
-        async function processVerification() {
-            setStatus(
-                "Processing Verification...",
-                "Authenticating your Roblox account data, please wait..."
+        const response = await fetch(
+            'https://discord.com/api/users/@me',
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                'Failed to retrieve Discord account.'
             );
+        }
 
-            try {
-                if (!returnedDiscordId) {
-                    throw new Error("Missing Discord user ID in OAuth state.");
-                }
+        return await response.json();
+    }
 
-                if (!authCode) {
-                    throw new Error("Missing Roblox authorization code.");
-                }
+    async function processVerification() {
+        setStatus(
+            "Processing Verification...",
+            "Authenticating your Roblox account data, please wait..."
+        );
 
-                const verifyUrl = new URL(BACKEND_URL);
-                verifyUrl.searchParams.set('code', authCode);
-                verifyUrl.searchParams.set('state', returnedDiscordId);
-
-                const response = await fetch(verifyUrl.toString(), {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const contentType = response.headers.get('content-type') || '';
-                let data = {};
-
-                if (contentType.includes('application/json')) {
-                    data = await response.json();
-                } else {
-                    const text = await response.text();
-                    throw new Error(
-                        `Backend returned HTTP ${response.status} instead of JSON: ${text.slice(0, 200)}`
-                    );
-                }
-
-                if (!response.ok) {
-                    throw new Error(data.message || data.error || `Backend returned HTTP ${response.status}.`);
-                }
-
-                if (data.success) {
-                    setStatus(
-                        "Success!",
-                        data.message || "Your Roblox account has been successfully verified."
-                    );
-                } else {
-                    setStatus(
-                        "Verification Failed",
-                        data.message || data.error || "The backend could not verify your Roblox account."
-                    );
-                }
-            } catch (error) {
-                console.error("[OceanWorks Verification]", error);
-
-                setStatus(
-                    "Connection Error",
-                    `Could not complete verification. ${error.message || "The backend server could not be reached."}`
+        try {
+            if (!returnedDiscordId) {
+                throw new Error(
+                    "Missing Discord user ID in OAuth state."
                 );
             }
+
+            if (!authCode) {
+                throw new Error(
+                    "Missing Roblox authorization code."
+                );
+            }
+
+            const verifyUrl = new URL(
+                BACKEND_URL
+            );
+
+            verifyUrl.searchParams.set(
+                'code',
+                authCode
+            );
+
+            verifyUrl.searchParams.set(
+                'state',
+                returnedDiscordId
+            );
+
+            const response = await fetch(
+                verifyUrl.toString(),
+                {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json'
+                    }
+                }
+            );
+
+            const contentType =
+                response.headers.get(
+                    'content-type'
+                ) || '';
+
+            let data = {};
+
+            if (
+                contentType.includes(
+                    'application/json'
+                )
+            ) {
+                data = await response.json();
+            } else {
+                const text =
+                    await response.text();
+
+                throw new Error(
+                    `Backend returned HTTP ${response.status}: ${text}`
+                );
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    data.error ||
+                    `Backend returned HTTP ${response.status}`
+                );
+            }
+
+            if (data.success) {
+                setStatus(
+                    "Success!",
+                    data.message ||
+                    "Your Roblox account has been successfully verified."
+                );
+            } else {
+                setStatus(
+                    "Verification Failed",
+                    data.message ||
+                    data.error ||
+                    "Verification failed."
+                );
+            }
+
+        } catch (error) {
+            console.error(
+                "[OceanWorks Verification]",
+                error
+            );
+
+            setStatus(
+                "Connection Error",
+                error.message ||
+                "Failed to contact backend."
+            );
+        }
+    }
+
+    function startRobloxLogin() {
+        if (!discordUserId) {
+            loginWithDiscord();
+            return;
         }
 
-        function startRobloxLogin() {
-            const targetDiscordId = discordUserId;
+        const robloxAuthUrl = new URL(
+            'https://apis.roblox.com/oauth/v1/authorize'
+        );
 
-            if (!targetDiscordId) {
-                setStatus(
-                    "Discord ID Required",
-                    "Open the verification link from Discord so your Discord account can be linked.",
-                    true
-                );
+        robloxAuthUrl.searchParams.set(
+            'client_id',
+            clientId
+        );
+
+        robloxAuthUrl.searchParams.set(
+            'redirect_uri',
+            redirectUri
+        );
+
+        robloxAuthUrl.searchParams.set(
+            'response_type',
+            'code'
+        );
+
+        robloxAuthUrl.searchParams.set(
+            'scope',
+            'openid profile'
+        );
+
+        robloxAuthUrl.searchParams.set(
+            'state',
+            discordUserId
+        );
+
+        window.location.href =
+            robloxAuthUrl.toString();
+    }
+
+    document
+        .getElementById('roblox-login-btn')
+        .addEventListener(
+            'click',
+            function(event) {
+                event.preventDefault();
+                startRobloxLogin();
+            }
+        );
+
+    (async () => {
+        try {
+
+            if (authCode) {
+                processVerification();
                 return;
             }
 
-            const robloxAuthUrl = new URL(
-                'https://apis.roblox.com/oauth/v1/authorize'
+            if (!discordUserId) {
+
+                const user =
+                    await getDiscordUser();
+
+                if (!user) {
+                    loginWithDiscord();
+                    return;
+                }
+
+                discordUserId = user.id;
+
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    `${window.location.pathname}?discordId=${user.id}`
+                );
+            }
+
+            document.getElementById(
+                'action-area'
+            ).style.display = 'block';
+
+        } catch (error) {
+
+            console.error(error);
+
+            setStatus(
+                "Discord Authentication Failed",
+                error.message
             );
-
-            robloxAuthUrl.searchParams.set('client_id', clientId);
-            robloxAuthUrl.searchParams.set('redirect_uri', redirectUri);
-            robloxAuthUrl.searchParams.set('response_type', 'code');
-            robloxAuthUrl.searchParams.set('scope', 'openid profile');
-            robloxAuthUrl.searchParams.set('state', targetDiscordId);
-
-            window.location.href = robloxAuthUrl.toString();
         }
-
-        document.getElementById('roblox-login-btn').addEventListener('click', function(event) {
-            event.preventDefault();
-            startRobloxLogin();
-        });
-
-        if (authCode) {
-            processVerification();
-        } else {
-            document.getElementById('action-area').style.display = 'block';
-        }
-    </script>
+    })();
+</script>
 </body>
 </html>
