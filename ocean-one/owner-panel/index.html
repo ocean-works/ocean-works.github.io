@@ -417,6 +417,28 @@
             cursor: pointer;
         }
 
+        .access-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
+
+        .access-tag.owner {
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .access-tag.key {
+            background: rgba(250, 166, 26, 0.15);
+            color: #faa61a;
+        }
+
         .hidden { display: none !important; }
 
         footer {
@@ -488,7 +510,7 @@
                 <!-- 2. Server Selector View -->
                 <div id="selector-section" class="hidden">
                     <h1>Select a Server</h1>
-                    <p>Choose a server where you are the owner and Ocean One is added.</p>
+                    <p>Choose a server you own, or one where you've been given an owner panel key.</p>
 
                     <div class="select-group">
                         <select id="server-select" onchange="handleServerSelection()">
@@ -550,7 +572,10 @@
         }
 
         let userGuildsData = [];
+        let accessibleGuilds = []; // [{ id, name, isOwner, isKeyHolder }]
+        let myUsername = null;
         let currentSelectedGuildId = null;
+        let currentSelectedIsOwner = false;
         let isCurrentServerPlus = false;
         let serverChannels = [];
         let serverCategories = [];
@@ -580,19 +605,48 @@
 
         async function fetchUserData(token) {
             try {
-                const guildsRes = await fetch('https://discord.com/api/users/@me/guilds', {
-                    headers: { authorization: `Bearer ${token}` }
-                });
+                const [guildsRes, meRes] = await Promise.all([
+                    fetch('https://discord.com/api/users/@me/guilds', {
+                        headers: { authorization: `Bearer ${token}` }
+                    }),
+                    fetch('https://discord.com/api/users/@me', {
+                        headers: { authorization: `Bearer ${token}` }
+                    })
+                ]);
 
-                if (!guildsRes.ok) {
+                if (!guildsRes.ok || !meRes.ok) {
                     throw new Error('Token expired or invalid');
                 }
 
                 userGuildsData = await guildsRes.json();
-                const ownedGuilds = userGuildsData.filter(guild => guild.owner === true);
+                const me = await meRes.json();
+                myUsername = me.username;
 
-                if (ownedGuilds.length === 0) {
-                    alert("You do not own any Discord servers.");
+                const ownedGuilds = userGuildsData.filter(guild => guild.owner === true);
+                const nonOwnedGuilds = userGuildsData.filter(guild => guild.owner !== true);
+
+                // Check key-based access for every guild the user is a member of but doesn't own.
+                // This is what lets a delegated user (given a key by the real owner) reach a
+                // server's panel without being the actual Discord server owner.
+                const keyCheckResults = await Promise.all(
+                    nonOwnedGuilds.map(guild =>
+                        fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(guild.id)}/keys/check?username=${encodeURIComponent(myUsername)}`, {
+                            headers: { ...NGROK_HEADERS }
+                        })
+                            .then(res => res.ok ? res.json() : { hasAccess: false })
+                            .catch(() => ({ hasAccess: false }))
+                    )
+                );
+
+                accessibleGuilds = [
+                    ...ownedGuilds.map(g => ({ id: g.id, name: g.name, isOwner: true, isKeyHolder: false })),
+                    ...nonOwnedGuilds
+                        .filter((g, i) => keyCheckResults[i].hasAccess)
+                        .map(g => ({ id: g.id, name: g.name, isOwner: false, isKeyHolder: true }))
+                ];
+
+                if (accessibleGuilds.length === 0) {
+                    alert("You don't own any servers, and you haven't been given an owner panel key for any server.");
                     logoutSession();
                     return;
                 }
@@ -600,10 +654,10 @@
                 const selectElement = document.getElementById('server-select');
                 selectElement.innerHTML = '<option value="" disabled selected>-- Select Your Server --</option>';
 
-                ownedGuilds.forEach(guild => {
+                accessibleGuilds.forEach(guild => {
                     const option = document.createElement('option');
                     option.value = guild.id;
-                    option.textContent = guild.name;
+                    option.textContent = guild.name + (guild.isKeyHolder ? ' (Key Access)' : '');
                     selectElement.appendChild(option);
                 });
 
@@ -638,7 +692,8 @@
         async function loadDashboard() {
             const selectElement = document.getElementById('server-select');
             currentSelectedGuildId = selectElement.value;
-            const selectedGuild = userGuildsData.find(g => g.id === currentSelectedGuildId);
+            const selectedGuild = accessibleGuilds.find(g => g.id === currentSelectedGuildId);
+            currentSelectedIsOwner = selectedGuild ? selectedGuild.isOwner : false;
 
             try {
                 const res = await fetch(
@@ -695,7 +750,10 @@
             }
 
             if (selectedGuild) {
-                document.getElementById('dashboard-server-name').innerText = `Managing: ${selectedGuild.name}`;
+                const accessTag = selectedGuild.isOwner
+                    ? '<span class="access-tag owner">Owner</span>'
+                    : '<span class="access-tag key">Key Access</span>';
+                document.getElementById('dashboard-server-name').innerHTML = `Managing: ${selectedGuild.name}${accessTag}`;
                 document.getElementById('dashboard-subtitle').innerText = isCurrentServerPlus
                     ? "Ocean+ Active: Per-server nitro profile branding & advanced features unlocked."
                     : "Standard Ocean One Server Panel. Upgrade to Ocean+ to unlock advanced features.";
@@ -723,89 +781,99 @@
                     key: 'moderation',
                     title: '🛡️ Moderation Controls',
                     desc: 'Toggle invite-link protection, spam detection, mass-action detection, and set exempt roles/channels.',
-                    requiresPlus: false
+                    requiresPlus: false,
+                    ownerOnly: false
                 },
                 {
                     key: 'ticket_panel',
                     title: '🎫 Ticket Panel',
                     desc: 'Send the ticket portal panel to a channel so members can open tickets.',
-                    requiresPlus: false
+                    requiresPlus: false,
+                    ownerOnly: false
                 },
                 {
                     key: 'ticket_config',
                     title: '⚙️ Ticket Configuration',
                     desc: 'Rename ticket types, set the staff role, and choose a ticket category. Free servers get 4 types, Ocean+ servers get 15.',
-                    requiresPlus: false
+                    requiresPlus: false,
+                    ownerOnly: false
                 },
                 {
                     key: 'sessions',
                     title: '📋 Session Management',
                     desc: 'Set the sessions channel and pick which roles can host or manage sessions.',
-                    requiresPlus: false
+                    requiresPlus: false,
+                    ownerOnly: false
                 },
                 {
                     key: 'logs',
                     title: '📋 Server Logging',
                     desc: 'Basic logging is included free. Ocean+ upgrades it to advanced logging with richer detail, more event types, and searchable history via /logs search.',
-                    requiresPlus: false
+                    requiresPlus: false,
+                    ownerOnly: false
+                },
+                {
+                    key: 'owner_keys',
+                    title: '🔑 Owner Panel Keys',
+                    desc: 'Grant other Discord users access to this panel by username. Regular servers can give out 1 key; Ocean+ servers can give out up to 3.',
+                    requiresPlus: false,
+                    ownerOnly: true
                 },
                 {
                     key: 'customization',
                     title: '🎨 Ocean+ Bot Profile',
                     desc: 'Customize the bot nickname for this server (avatar/banner are saved but cannot be applied — Discord bots do not support per-server avatars or banners).',
-                    requiresPlus: true
+                    requiresPlus: true,
+                    ownerOnly: false
                 },
                 {
                     key: 'verification',
                     title: '✅ Advanced Verification',
                     desc: 'Custom web-based button verification gating to prevent bot raids.',
-                    requiresPlus: true
-                },
-                {
-                    key: 'keys',
-                    title: '🔑 Access Keys Management',
-                    desc: 'Grant user keys to allow trusted individuals access to this server panel. Standard limit is 1 key, Ocean+ allows up to 3 keys.',
-                    requiresPlus: false
+                    requiresPlus: true,
+                    ownerOnly: false
                 }
             ];
 
-            allModules.forEach(mod => {
-                const isLocked = mod.requiresPlus && !isCurrentServerPlus;
-                const card = document.createElement('div');
-                card.className = `module-card ${isLocked ? 'locked' : ''}`;
+            allModules
+                .filter(mod => !mod.ownerOnly || currentSelectedIsOwner)
+                .forEach(mod => {
+                    const isLocked = mod.requiresPlus && !isCurrentServerPlus;
+                    const card = document.createElement('div');
+                    card.className = `module-card ${isLocked ? 'locked' : ''}`;
 
-                let badgeHtml = '';
-                if (mod.requiresPlus) {
-                    badgeHtml = isLocked
-                        ? `<div class="plus-badge locked-badge">Ocean+ Locked</div>`
-                        : `<div class="plus-badge">Ocean+ Active</div>`;
-                }
+                    let badgeHtml = '';
+                    if (mod.requiresPlus) {
+                        badgeHtml = isLocked
+                            ? `<div class="plus-badge locked-badge">Ocean+ Locked</div>`
+                            : `<div class="plus-badge">Ocean+ Active</div>`;
+                    }
 
-                let footerHtml = '';
-                if (isLocked) {
-                    footerHtml = `
-                        <div class="toggle-switch" style="color: #64748b;">Requires Ocean+</div>
-                        <button class="edit-btn" disabled>Upgrade to Unlock</button>
+                    let footerHtml = '';
+                    if (isLocked) {
+                        footerHtml = `
+                            <div class="toggle-switch" style="color: #64748b;">Requires Ocean+</div>
+                            <button class="edit-btn" disabled>Upgrade to Unlock</button>
+                        `;
+                    } else {
+                        footerHtml = `
+                            <div class="toggle-switch"><input type="checkbox" checked> Active</div>
+                            <button class="edit-btn" onclick="openConfigModal('${mod.key}')">Edit Settings</button>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        ${badgeHtml}
+                        <div>
+                            <div class="module-title">${mod.title}</div>
+                            <p class="module-desc">${mod.desc}</p>
+                        </div>
+                        <div class="module-footer-action">
+                            ${footerHtml}
+                        </div>
                     `;
-                } else {
-                    footerHtml = `
-                        <div class="toggle-switch"><input type="checkbox" checked> Active</div>
-                        <button class="edit-btn" onclick="openConfigModal('${mod.key}')">Edit Settings</button>
-                    `;
-                }
-
-                card.innerHTML = `
-                    ${badgeHtml}
-                    <div>
-                        <div class="module-title">${mod.title}</div>
-                        <p class="module-desc">${mod.desc}</p>
-                    </div>
-                    <div class="module-footer-action">
-                        ${footerHtml}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+                    container.appendChild(card);
+                });
         }
 
         function buildOptionsHtml(list, selectedId, emptyLabel) {
@@ -843,90 +911,27 @@
                 channelOptionsHtml = '<option value="" disabled selected>No channels returned by backend</option>';
             }
 
-            if (moduleKey === 'keys') {
-                modalTitle.innerText = 'Access Keys Management';
-                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current keys...</p>`;
+            if (moduleKey === 'owner_keys') {
+                modalTitle.innerText = 'Owner Panel Keys';
+                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
                 document.getElementById('config-modal').classList.remove('hidden');
 
-                let current = { keys: [], maxKeys: isCurrentServerPlus ? 3 : 1 };
+                let current = { keys: [], limit: 1, isPlus: false };
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
                         headers: { ...NGROK_HEADERS }
                     });
                     if (res.ok) current = await res.json();
                 } catch (e) {
-                    console.warn('Could not load access keys configuration.', e);
+                    console.warn('Could not load owner panel keys.', e);
                 }
-
-                const maxAllowed = isCurrentServerPlus ? 3 : 1;
-                const keysList = current.keys || [];
-
-                let keysRowsHtml = keysList.map((k, index) => `
-                    <div class="form-group" style="display: flex; gap: 10px; align-items: center;">
-                        <input type="text" class="key-user-input" value="${k.userId || ''}" placeholder="Discord User ID">
-                        <button type="button" class="btn btn-secondary" style="padding: 10px 15px;" onclick="this.parentElement.remove()">Remove</button>
-                    </div>
-                `).join('');
-
-                modalBody.innerHTML = `
-                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Give panel access keys to trusted users via their Discord User ID. You can issue up to <strong>${maxAllowed}</strong> key(s)${isCurrentServerPlus ? ' (Ocean+ limit)' : ' (Upgrade to Ocean+ for up to 3)'}.</p>
-                    <div id="keys-container">
-                        ${keysRowsHtml}
-                    </div>
-                    <button type="button" class="btn btn-secondary" style="margin-top: 10px;" onclick="addKeyField(${maxAllowed})">Add Key Slot</button>
-                `;
-                return;
-            }
-
-            if (moduleKey === 'moderation') {
-                modalTitle.innerText = 'Moderation Controls';
-                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
-                document.getElementById('config-modal').classList.remove('hidden');
-
-                let current = { enabled: {}, exemptRoleIds: [], exemptChannelIds: [] };
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/moderation`, {
-                        headers: { ...NGROK_HEADERS }
-                    });
-                    if (res.ok) current = await res.json();
-                } catch (e) {
-                    console.warn('Could not load moderation configuration.', e);
-                }
-
-                const enabled = current.enabled || {};
-                const toggles = [
-                    { key: 'inviteLinks', label: 'Invite Link Protection' },
-                    { key: 'spamPerUser', label: 'Per-User Spam Protection' },
-                    { key: 'massChannelOps', label: 'Mass Channel Deletion/Rename Detection' },
-                    { key: 'massBansKicks', label: 'Mass Ban/Kick Detection' },
-                    { key: 'massMessages', label: 'Mass Message Spam Detection' },
-                    { key: 'everyonePing', label: 'Mass @everyone/@here Detection' }
-                ];
-
-                const toggleRowsHtml = toggles.map(t => `
-                    <div class="check-row">
-                        <input type="checkbox" id="mod-toggle-${t.key}" ${enabled[t.key] !== false ? 'checked' : ''}>
-                        <label for="mod-toggle-${t.key}">${t.label}</label>
-                    </div>
-                `).join('');
-
-                const exemptRoleOptionsHtml = buildMultiSelectOptionsHtml(serverRoles, current.exemptRoleIds);
-                const exemptChannelOptionsHtml = buildMultiSelectOptionsHtml(serverChannels, current.exemptChannelIds);
 
                 modalBody.innerHTML = `
                     <div class="form-group">
-                        <label>Protections</label>
-                        ${toggleRowsHtml}
+                        <label>Discord Usernames (one per line, max ${current.limit})</label>
+                        <textarea id="cfg-owner-keys" rows="4">${current.keys.join('\n')}</textarea>
                     </div>
-                    <div class="form-group">
-                        <label>Exempt Roles (ctrl/cmd-click to select multiple)</label>
-                        <select id="cfg-mod-exempt-roles" multiple size="5">${exemptRoleOptionsHtml}</select>
-                    </div>
-                    <div class="form-group">
-                        <label>Exempt Channels (ctrl/cmd-click to select multiple)</label>
-                        <select id="cfg-mod-exempt-channels" multiple size="5">${exemptChannelOptionsHtml}</select>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 13px;">Members with an exempt role, or messages in an exempt channel, skip invite-link and spam checks.</p>
+                    <p style="color: var(--text-muted); font-size: 13px;">Anyone whose Discord username is listed here will be able to log in and manage this server's panel, even though they don't own it. Limit: ${current.keys.length}/${current.limit}${current.isPlus ? ' (Ocean+)' : ' — upgrade to Ocean+ for up to 3'}.</p>
                 `;
                 return;
             }
@@ -1097,50 +1102,27 @@
             document.getElementById('config-modal').classList.remove('hidden');
         }
 
-        function addKeyField(maxAllowed) {
-            const container = document.getElementById('keys-container');
-            const currentCount = container.children.length;
-            if (currentCount >= maxAllowed) {
-                alert(`You have reached the maximum limit of ${maxAllowed} key(s) for this server.`);
-                return;
-            }
-            const div = document.createElement('div');
-            div.className = 'form-group';
-            div.style.cssText = 'display: flex; gap: 10px; align-items: center;';
-            div.innerHTML = `
-                <input type="text" class="key-user-input" value="" placeholder="Discord User ID">
-                <button type="button" class="btn btn-secondary" style="padding: 10px 15px;" onclick="this.parentElement.remove()">Remove</button>
-            `;
-            container.appendChild(div);
-        }
-
         function closeConfigModal() {
             document.getElementById('config-modal').classList.add('hidden');
         }
 
         async function saveConfigModal() {
-            if (activeConfigModule === 'keys') {
-                const inputs = document.querySelectorAll('.key-user-input');
-                const userIds = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
-                const maxAllowed = isCurrentServerPlus ? 3 : 1;
-
-                if (userIds.length > maxAllowed) {
-                    alert(`Maximum allowed keys for this server is ${maxAllowed}.`);
-                    return;
-                }
+            if (activeConfigModule === 'owner_keys') {
+                const keysRaw = document.getElementById('cfg-owner-keys').value;
+                const keys = keysRaw.split('\n').map(k => k.trim()).filter(Boolean);
 
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
-                        body: JSON.stringify({ userIds })
+                        body: JSON.stringify({ keys })
                     });
                     const data = await res.json().catch(() => ({}));
                     if (res.ok) {
-                        alert('Access keys saved!');
+                        alert('Owner panel keys saved!');
                         closeConfigModal();
                     } else {
-                        alert(data.error || 'Failed to save access keys.');
+                        alert(data.error || 'Failed to save owner panel keys.');
                     }
                 } catch (err) {
                     console.error(err);
@@ -1182,7 +1164,7 @@
 
             if (activeConfigModule === 'ticket_panel') {
                 const channelId = document.getElementById('cfg-panel-channel').value;
-                const selectedGuild = userGuildsData.find(g => g.id === currentSelectedGuildId);
+                const selectedGuild = accessibleGuilds.find(g => g.id === currentSelectedGuildId);
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets/panel`, {
                         method: 'POST',
@@ -1283,7 +1265,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error connecting to backend server[cite: 1].');
+                alert('Error connecting to backend server.');
             }
         }
     </script>
