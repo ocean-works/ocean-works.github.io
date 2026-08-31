@@ -760,6 +760,12 @@
                     title: '✅ Advanced Verification',
                     desc: 'Custom web-based button verification gating to prevent bot raids.',
                     requiresPlus: true
+                },
+                {
+                    key: 'keys',
+                    title: '🔑 Access Keys Management',
+                    desc: 'Grant user keys to allow trusted individuals access to this server panel. Standard limit is 1 key, Ocean+ allows up to 3 keys.',
+                    requiresPlus: false
                 }
             ];
 
@@ -835,6 +841,41 @@
 
             if (!channelOptionsHtml) {
                 channelOptionsHtml = '<option value="" disabled selected>No channels returned by backend</option>';
+            }
+
+            if (moduleKey === 'keys') {
+                modalTitle.innerText = 'Access Keys Management';
+                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current keys...</p>`;
+                document.getElementById('config-modal').classList.remove('hidden');
+
+                let current = { keys: [], maxKeys: isCurrentServerPlus ? 3 : 1 };
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
+                        headers: { ...NGROK_HEADERS }
+                    });
+                    if (res.ok) current = await res.json();
+                } catch (e) {
+                    console.warn('Could not load access keys configuration.', e);
+                }
+
+                const maxAllowed = isCurrentServerPlus ? 3 : 1;
+                const keysList = current.keys || [];
+
+                let keysRowsHtml = keysList.map((k, index) => `
+                    <div class="form-group" style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" class="key-user-input" value="${k.userId || ''}" placeholder="Discord User ID">
+                        <button type="button" class="btn btn-secondary" style="padding: 10px 15px;" onclick="this.parentElement.remove()">Remove</button>
+                    </div>
+                `).join('');
+
+                modalBody.innerHTML = `
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Give panel access keys to trusted users via their Discord User ID. You can issue up to <strong>${maxAllowed}</strong> key(s)${isCurrentServerPlus ? ' (Ocean+ limit)' : ' (Upgrade to Ocean+ for up to 3)'}.</p>
+                    <div id="keys-container">
+                        ${keysRowsHtml}
+                    </div>
+                    <button type="button" class="btn btn-secondary" style="margin-top: 10px;" onclick="addKeyField(${maxAllowed})">Add Key Slot</button>
+                `;
+                return;
             }
 
             if (moduleKey === 'moderation') {
@@ -1056,11 +1097,58 @@
             document.getElementById('config-modal').classList.remove('hidden');
         }
 
+        function addKeyField(maxAllowed) {
+            const container = document.getElementById('keys-container');
+            const currentCount = container.children.length;
+            if (currentCount >= maxAllowed) {
+                alert(`You have reached the maximum limit of ${maxAllowed} key(s) for this server.`);
+                return;
+            }
+            const div = document.createElement('div');
+            div.className = 'form-group';
+            div.style.cssText = 'display: flex; gap: 10px; align-items: center;';
+            div.innerHTML = `
+                <input type="text" class="key-user-input" value="" placeholder="Discord User ID">
+                <button type="button" class="btn btn-secondary" style="padding: 10px 15px;" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            container.appendChild(div);
+        }
+
         function closeConfigModal() {
             document.getElementById('config-modal').classList.add('hidden');
         }
 
         async function saveConfigModal() {
+            if (activeConfigModule === 'keys') {
+                const inputs = document.querySelectorAll('.key-user-input');
+                const userIds = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
+                const maxAllowed = isCurrentServerPlus ? 3 : 1;
+
+                if (userIds.length > maxAllowed) {
+                    alert(`Maximum allowed keys for this server is ${maxAllowed}.`);
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                        body: JSON.stringify({ userIds })
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok) {
+                        alert('Access keys saved!');
+                        closeConfigModal();
+                    } else {
+                        alert(data.error || 'Failed to save access keys.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error connecting to backend server.');
+                }
+                return;
+            }
+
             if (activeConfigModule === 'moderation') {
                 const toggleKeys = ['inviteLinks', 'spamPerUser', 'massChannelOps', 'massBansKicks', 'massMessages', 'everyonePing'];
                 const enabled = {};
@@ -1195,7 +1283,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error connecting to backend server.');
+                alert('Error connecting to backend server[cite: 1].');
             }
         }
     </script>
