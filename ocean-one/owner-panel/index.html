@@ -6,18 +6,32 @@
     <title>Ocean One | Server Management Panel</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #121212;
-            --border-color: #222222;
-            --accent-orange: #f67111;
-            --text-main: #c9d1d9;
-            --text-muted: #888888;
+            --bg-color: #050505;
+            --card-bg: #0d1117;
+            --card-hover: #111827;
+            --border-color: #1e293b;
+
+            --accent-primary: #2563eb;
+            --accent-secondary: #60a5fa;
+            --accent-glow: #93c5fd;
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+
             --sidebar-width: 260px;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
             color: var(--text-main);
             margin: 0;
             padding: 0;
@@ -29,7 +43,7 @@
         .top-bar {
             width: 100%;
             height: 6px;
-            background-color: var(--accent-orange);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
             position: fixed;
             top: 0;
             left: 0;
@@ -44,7 +58,7 @@
 
         sidebar {
             width: var(--sidebar-width);
-            background-color: var(--card-bg);
+            background: #0a0a0a;
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
@@ -52,20 +66,24 @@
             position: fixed;
             height: calc(100vh - 6px);
             box-sizing: border-box;
+            backdrop-filter: blur(12px);
         }
 
         .sidebar-brand {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: 700;
             margin-bottom: 40px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 4px;
         }
 
-        .sidebar-brand span {
-            color: var(--accent-orange);
+        .sidebar-brand span:first-child {
+            color: white;
+        }
+
+        .sidebar-brand span:last-child {
+            color: var(--accent-primary);
         }
 
         .sidebar-menu {
@@ -83,15 +101,15 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
-            padding: 10px 15px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: 0.25s ease;
         }
 
         .sidebar-menu a:hover, .sidebar-menu a.active {
-            color: #ffffff;
-            background-color: rgba(246, 113, 17, 0.1);
-            border-left: 3px solid var(--accent-orange);
+            color: white;
+            background: rgba(59, 130, 246, 0.12);
+            border-left: 3px solid var(--accent-primary);
         }
 
         .sidebar-footer {
@@ -105,7 +123,7 @@
         }
 
         .logout-link {
-            color: #ff5555;
+            color: #f87171;
             cursor: pointer;
             text-decoration: none;
             font-weight: 600;
@@ -125,62 +143,69 @@
         }
 
         .content-container {
-            max-width: 900px;
+            max-width: 950px;
             margin: auto;
             width: 100%;
-            background-color: var(--card-bg);
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
             text-align: center;
         }
 
         h1 {
-            color: #ffffff;
+            color: white;
             font-size: 2.2rem;
             margin-top: 0;
             margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff, var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         p {
             color: var(--text-muted);
             font-size: 15px;
-            line-height: 1.6;
+            line-height: 1.8;
             margin-bottom: 25px;
         }
 
         .btn {
-            background-color: var(--accent-orange);
-            color: #ffffff;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
             border: none;
             text-decoration: none;
-            padding: 12px 28px;
-            border-radius: 8px;
+            padding: 13px 30px;
+            border-radius: 10px;
             font-weight: bold;
             font-size: 14px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: 0.25s ease;
             display: inline-block;
         }
 
         .btn:hover:not(:disabled) {
-            background-color: #d45b09;
-            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
+            transform: translateY(-2px);
         }
 
         .btn:disabled {
-            background-color: #2a2a2a;
-            color: #666666;
+            background: #1c2436;
+            color: #64748b;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .btn-secondary {
-            background-color: #222;
+            background: #14243d;
+            color: white;
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background-color: #333;
+            background: #19304f;
+            transform: translateY(-3px);
         }
 
         .select-group {
@@ -188,11 +213,11 @@
         }
 
         select, input[type="text"], textarea {
-            background-color: #1a1a1a;
-            color: #ffffff;
+            background: #0a0f1a;
+            color: white;
             border: 1px solid var(--border-color);
             padding: 12px 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 15px;
             width: 100%;
             max-width: 400px;
@@ -201,8 +226,12 @@
             box-sizing: border-box;
         }
 
+        select[multiple] {
+            min-height: 120px;
+        }
+
         select:focus, input[type="text"]:focus, textarea:focus {
-            border-color: var(--accent-orange);
+            border-color: var(--accent-primary);
         }
 
         .modules-grid {
@@ -215,20 +244,26 @@
         }
 
         .module-card {
-            background-color: #181a1f;
+            background: var(--card-hover);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 25px;
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: border-color 0.2s;
+            transition: 0.25s ease;
+        }
+
+        .module-card:not(.locked):hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
         }
 
         .module-card.locked {
             opacity: 0.45;
-            background-color: #111317;
+            background: #0b0f18;
             border-style: dashed;
         }
 
@@ -236,25 +271,25 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background-color: var(--accent-orange);
-            color: #ffffff;
+            background: var(--accent-primary);
+            color: white;
             font-size: 11px;
             font-weight: bold;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .plus-badge.locked-badge {
-            background-color: #333333;
-            color: #aaaaaa;
+            background: #334155;
+            color: #94a3b8;
         }
 
         .module-title {
             font-size: 16px;
             font-weight: bold;
-            color: #ffffff;
+            color: white;
             margin-bottom: 8px;
         }
 
@@ -262,6 +297,7 @@
             font-size: 13px;
             color: var(--text-muted);
             margin: 0 0 15px 0;
+            line-height: 1.6;
         }
 
         .module-footer-action {
@@ -286,7 +322,7 @@
             border: 1px solid var(--border-color);
             color: var(--text-main);
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
@@ -294,13 +330,13 @@
         }
 
         .edit-btn:hover:not(:disabled) {
-            border-color: var(--accent-orange);
-            color: var(--accent-orange);
+            border-color: var(--accent-primary);
+            color: var(--accent-secondary);
         }
 
         .edit-btn:disabled {
-            border-color: #222;
-            color: #555;
+            border-color: #1e293b;
+            color: #475569;
             cursor: not-allowed;
         }
 
@@ -318,19 +354,21 @@
         }
 
         .modal {
-            background-color: #161b22;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             padding: 30px;
-            border-radius: 12px;
+            border-radius: 16px;
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
+            max-height: 85vh;
+            overflow-y: auto;
             text-align: left;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .modal h3 {
             margin-top: 0;
-            color: #fff;
+            color: white;
             font-size: 1.4rem;
         }
 
@@ -353,6 +391,32 @@
             margin-top: 25px;
         }
 
+        .check-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .check-row:last-child {
+            border-bottom: none;
+        }
+
+        .check-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .check-row label {
+            margin: 0;
+            color: var(--text-main);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
         .hidden { display: none !important; }
 
         footer {
@@ -364,6 +428,7 @@
             align-items: center;
             font-size: 13px;
             color: var(--text-muted);
+            flex-wrap: wrap;
         }
 
         .footer-links {
@@ -378,13 +443,14 @@
         }
 
         .footer-links a:hover {
-            color: var(--accent-orange);
+            color: var(--accent-secondary);
         }
 
         @media (max-width: 768px) {
             sidebar { display: none; }
             .main-content { margin-left: 0; padding: 20px; }
             .content-container { padding: 30px 20px; }
+            h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -395,7 +461,7 @@
         <!-- Sidebar Navigation -->
         <sidebar>
             <div class="sidebar-brand">
-                Ocean <span>Works</span>
+                <span>Ocean</span><span>One</span>
             </div>
             <ul class="sidebar-menu">
                 <li><a href="/">Home</a></li>
@@ -411,7 +477,7 @@
         <!-- Main Content Area -->
         <div class="main-content">
             <div class="content-container">
-                
+
                 <!-- 1. Login View -->
                 <div id="login-section">
                     <h1>Ocean One Owner Panel</h1>
@@ -423,7 +489,7 @@
                 <div id="selector-section" class="hidden">
                     <h1>Select a Server</h1>
                     <p>Choose a server where you are the owner and Ocean One is added.</p>
-                    
+
                     <div class="select-group">
                         <select id="server-select" onchange="handleServerSelection()">
                             <option value="" disabled selected>-- Select Your Server --</option>
@@ -471,10 +537,10 @@
     </div>
 
     <script>
-        const CLIENT_ID = '1530208568392028302'; 
+        const CLIENT_ID = '1530208568392028302';
         const BACKEND_URL = 'https://legibly-getaway-demote.ngrok-free.dev';
         const NGROK_HEADERS = { 'ngrok-skip-browser-warning': 'true' };
-        
+
         let REDIRECT_URI;
         const currentHost = window.location.hostname;
         if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
@@ -602,9 +668,6 @@
                 serverChannels = data.channels;
                 serverCategories = Array.isArray(data.categories) ? data.categories : [];
                 serverRoles = Array.isArray(data.roles) ? data.roles : [];
-
-                // The backend is responsible for reading plus.json and returning
-                // whether THIS guild has Ocean+.
                 isCurrentServerPlus = data.isPlus === true;
 
                 console.log(
@@ -619,8 +682,6 @@
             } catch (e) {
                 console.error("Could not load server data from Ocean One backend:", e, `(${BACKEND_URL})`);
 
-                // Do not silently fake an ocean-one channel or mark the server
-                // as non-Plus. That was hiding the actual backend problem.
                 serverChannels = [];
                 serverCategories = [];
                 serverRoles = [];
@@ -635,8 +696,8 @@
 
             if (selectedGuild) {
                 document.getElementById('dashboard-server-name').innerText = `Managing: ${selectedGuild.name}`;
-                document.getElementById('dashboard-subtitle').innerText = isCurrentServerPlus 
-                    ? "Ocean+ Active: Per-server nitro profile branding & advanced features unlocked." 
+                document.getElementById('dashboard-subtitle').innerText = isCurrentServerPlus
+                    ? "Ocean+ Active: Per-server nitro profile branding & advanced features unlocked."
                     : "Standard Ocean One Server Panel. Upgrade to Ocean+ to unlock advanced features.";
             }
 
@@ -657,18 +718,11 @@
             const container = document.getElementById('modules-container');
             container.innerHTML = '';
 
-            // Master list of all modules, marking which ones require Ocean+
             const allModules = [
                 {
-                    key: 'antinuke',
-                    title: '🛡️ Anti-Nuke Protection',
-                    desc: 'Detects and blocks mass channel deletions and unauthorized ban spikes.',
-                    requiresPlus: false
-                },
-                {
-                    key: 'antispam',
-                    title: '💬 Anti-Spam & Links',
-                    desc: 'Deletes mass message spam and unauthorized invite links automatically.',
+                    key: 'moderation',
+                    title: '🛡️ Moderation Controls',
+                    desc: 'Toggle invite-link protection, spam detection, mass-action detection, and set exempt roles/channels.',
                     requiresPlus: false
                 },
                 {
@@ -690,27 +744,21 @@
                     requiresPlus: false
                 },
                 {
+                    key: 'logs',
+                    title: '📋 Server Logging',
+                    desc: 'Basic logging is included free. Ocean+ upgrades it to advanced logging with richer detail, more event types, and searchable history via /logs search.',
+                    requiresPlus: false
+                },
+                {
                     key: 'customization',
                     title: '🎨 Ocean+ Bot Profile',
-                    desc: 'Customize per-server bot nickname, profile picture, banner, and bio layout like Nitro.',
+                    desc: 'Customize the bot nickname for this server (avatar/banner are saved but cannot be applied — Discord bots do not support per-server avatars or banners).',
                     requiresPlus: true
                 },
                 {
                     key: 'verification',
                     title: '✅ Advanced Verification',
                     desc: 'Custom web-based button verification gating to prevent bot raids.',
-                    requiresPlus: true
-                },
-                {
-                    key: 'logs',
-                    title: '📋 Extended Audit Logs',
-                    desc: 'Deep logging archives for every message edit, deletion, and role change.',
-                    requiresPlus: true
-                },
-                {
-                    key: 'antinuke-plus',
-                    title: '🛡️ Advanced Anti-Nuke Plus',
-                    desc: 'Strict multi-layer safeguard against mass bans, webhook spam, and structural wipes.',
                     requiresPlus: true
                 }
             ];
@@ -719,18 +767,18 @@
                 const isLocked = mod.requiresPlus && !isCurrentServerPlus;
                 const card = document.createElement('div');
                 card.className = `module-card ${isLocked ? 'locked' : ''}`;
-                
+
                 let badgeHtml = '';
                 if (mod.requiresPlus) {
-                    badgeHtml = isLocked 
-                        ? `<div class="plus-badge locked-badge">Ocean+ Locked</div>` 
+                    badgeHtml = isLocked
+                        ? `<div class="plus-badge locked-badge">Ocean+ Locked</div>`
                         : `<div class="plus-badge">Ocean+ Active</div>`;
                 }
 
                 let footerHtml = '';
                 if (isLocked) {
                     footerHtml = `
-                        <div class="toggle-switch" style="color: #666;">Requires Ocean+</div>
+                        <div class="toggle-switch" style="color: #64748b;">Requires Ocean+</div>
                         <button class="edit-btn" disabled>Upgrade to Unlock</button>
                     `;
                 } else {
@@ -787,6 +835,59 @@
 
             if (!channelOptionsHtml) {
                 channelOptionsHtml = '<option value="" disabled selected>No channels returned by backend</option>';
+            }
+
+            if (moduleKey === 'moderation') {
+                modalTitle.innerText = 'Moderation Controls';
+                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
+                document.getElementById('config-modal').classList.remove('hidden');
+
+                let current = { enabled: {}, exemptRoleIds: [], exemptChannelIds: [] };
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/moderation`, {
+                        headers: { ...NGROK_HEADERS }
+                    });
+                    if (res.ok) current = await res.json();
+                } catch (e) {
+                    console.warn('Could not load moderation configuration.', e);
+                }
+
+                const enabled = current.enabled || {};
+                const toggles = [
+                    { key: 'inviteLinks', label: 'Invite Link Protection' },
+                    { key: 'spamPerUser', label: 'Per-User Spam Protection' },
+                    { key: 'massChannelOps', label: 'Mass Channel Deletion/Rename Detection' },
+                    { key: 'massBansKicks', label: 'Mass Ban/Kick Detection' },
+                    { key: 'massMessages', label: 'Mass Message Spam Detection' },
+                    { key: 'everyonePing', label: 'Mass @everyone/@here Detection' }
+                ];
+
+                const toggleRowsHtml = toggles.map(t => `
+                    <div class="check-row">
+                        <input type="checkbox" id="mod-toggle-${t.key}" ${enabled[t.key] !== false ? 'checked' : ''}>
+                        <label for="mod-toggle-${t.key}">${t.label}</label>
+                    </div>
+                `).join('');
+
+                const exemptRoleOptionsHtml = buildMultiSelectOptionsHtml(serverRoles, current.exemptRoleIds);
+                const exemptChannelOptionsHtml = buildMultiSelectOptionsHtml(serverChannels, current.exemptChannelIds);
+
+                modalBody.innerHTML = `
+                    <div class="form-group">
+                        <label>Protections</label>
+                        ${toggleRowsHtml}
+                    </div>
+                    <div class="form-group">
+                        <label>Exempt Roles (ctrl/cmd-click to select multiple)</label>
+                        <select id="cfg-mod-exempt-roles" multiple size="5">${exemptRoleOptionsHtml}</select>
+                    </div>
+                    <div class="form-group">
+                        <label>Exempt Channels (ctrl/cmd-click to select multiple)</label>
+                        <select id="cfg-mod-exempt-channels" multiple size="5">${exemptChannelOptionsHtml}</select>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 13px;">Members with an exempt role, or messages in an exempt channel, skip invite-link and spam checks.</p>
+                `;
+                return;
             }
 
             if (moduleKey === 'ticket_panel') {
@@ -906,7 +1007,7 @@
                 return;
             }
 
-            if (['antinuke', 'antinuke-plus', 'antispam', 'verification', 'logs'].includes(moduleKey)) {
+            if (['verification', 'logs'].includes(moduleKey)) {
                 modalTitle.innerText = 'Loading...';
                 modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
                 document.getElementById('config-modal').classList.remove('hidden');
@@ -928,34 +1029,7 @@
                     return `<option value="${channelId}" ${isSelected}>#${channelName}</option>`;
                 }).join('') || '<option value="" disabled selected>No channels returned by backend</option>';
 
-                if (moduleKey === 'antinuke' || moduleKey === 'antinuke-plus') {
-                    modalTitle.innerText = moduleKey === 'antinuke-plus' ? 'Configure Advanced Anti-Nuke' : 'Configure Anti-Nuke';
-                    modalBody.innerHTML = `
-                        <div class="form-group">
-                            <label>Target Channel</label>
-                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
-                        </div>
-                        <div class="form-group">
-                            <label>Max Deletions Threshold</label>
-                            <input type="text" id="cfg-threshold" value="${saved.threshold || '3'}">
-                        </div>
-                    `;
-                } else if (moduleKey === 'antispam') {
-                    modalTitle.innerText = 'Configure Anti-Spam';
-                    modalBody.innerHTML = `
-                        <div class="form-group">
-                            <label>Target Channel</label>
-                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
-                        </div>
-                        <div class="form-group">
-                            <label>Action</label>
-                            <select id="cfg-action">
-                                <option value="delete" ${saved.action === 'delete' || !saved.action ? 'selected' : ''}>Delete Message</option>
-                                <option value="timeout" ${saved.action === 'timeout' ? 'selected' : ''}>Timeout Member</option>
-                            </select>
-                        </div>
-                    `;
-                } else if (moduleKey === 'verification') {
+                if (moduleKey === 'verification') {
                     modalTitle.innerText = 'Configure Verification';
                     modalBody.innerHTML = `
                         <div class="form-group">
@@ -968,7 +1042,7 @@
                         </div>
                     `;
                 } else if (moduleKey === 'logs') {
-                    modalTitle.innerText = 'Configure Extended Logs';
+                    modalTitle.innerText = 'Configure Server Logging';
                     modalBody.innerHTML = `
                         <div class="form-group">
                             <label>Target Channel</label>
@@ -987,6 +1061,37 @@
         }
 
         async function saveConfigModal() {
+            if (activeConfigModule === 'moderation') {
+                const toggleKeys = ['inviteLinks', 'spamPerUser', 'massChannelOps', 'massBansKicks', 'massMessages', 'everyonePing'];
+                const enabled = {};
+                toggleKeys.forEach(key => {
+                    const el = document.getElementById(`mod-toggle-${key}`);
+                    enabled[key] = el ? el.checked : true;
+                });
+
+                const exemptRoleIds = Array.from(document.getElementById('cfg-mod-exempt-roles').selectedOptions).map(o => o.value);
+                const exemptChannelIds = Array.from(document.getElementById('cfg-mod-exempt-channels').selectedOptions).map(o => o.value);
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/moderation`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                        body: JSON.stringify({ enabled, exemptRoleIds, exemptChannelIds })
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok) {
+                        alert('Moderation settings saved!');
+                        closeConfigModal();
+                    } else {
+                        alert(data.error || 'Failed to save moderation settings.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error connecting to backend server.');
+                }
+                return;
+            }
+
             if (activeConfigModule === 'ticket_panel') {
                 const channelId = document.getElementById('cfg-panel-channel').value;
                 const selectedGuild = userGuildsData.find(g => g.id === currentSelectedGuildId);
@@ -1068,11 +1173,7 @@
                 configData.bio = document.getElementById('cfg-bio').value;
             } else {
                 configData.channelId = document.getElementById('cfg-channel').value;
-                if (activeConfigModule === 'antinuke' || activeConfigModule === 'antinuke-plus') {
-                    configData.threshold = document.getElementById('cfg-threshold').value;
-                } else if (activeConfigModule === 'antispam') {
-                    configData.action = document.getElementById('cfg-action').value;
-                } else if (activeConfigModule === 'verification') {
+                if (activeConfigModule === 'verification') {
                     configData.role = document.getElementById('cfg-role').value;
                 }
             }
@@ -1084,11 +1185,13 @@
                     body: JSON.stringify({ moduleKey: activeConfigModule, configData })
                 });
 
+                const data = await res.json().catch(() => ({}));
+
                 if (res.ok) {
-                    alert(`Configuration for ${activeConfigModule} successfully saved to backend!`);
+                    alert(data.message || `Configuration for ${activeConfigModule} successfully saved!`);
                     closeConfigModal();
                 } else {
-                    alert('Failed to save configuration.');
+                    alert(data.error || 'Failed to save configuration.');
                 }
             } catch (err) {
                 console.error(err);
