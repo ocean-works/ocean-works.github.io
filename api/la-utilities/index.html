@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA Utilities</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>LA Utilities</h1>
+        <p>Connect your Roblox account to continue.</p>
+
+        <button onclick="loginWithRoblox()">
+            Login with Roblox
+        </button>
+    </div>
+
+    <script>
+        function loginWithRoblox() {
+            window.location.href =
+                "https://YOUR-API-DOMAIN.com/auth/roblox";
+        }
+    </script>
+
+</body>
+</html>
