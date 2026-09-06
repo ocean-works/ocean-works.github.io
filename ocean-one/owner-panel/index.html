@@ -391,6 +391,32 @@
             margin-top: 25px;
         }
 
+        .check-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .check-row:last-child {
+            border-bottom: none;
+        }
+
+        .check-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .check-row label {
+            margin: 0;
+            color: var(--text-main);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
         .access-tag {
             display: inline-block;
             font-size: 11px;
@@ -746,6 +772,13 @@
                     ownerOnly: false
                 },
                 {
+                    key: 'antiping',
+                    title: '🚫 Anti-Ping',
+                    desc: 'Pick a protected role. Anyone who pings that role, or a member of it, gets an automatic warning.',
+                    requiresPlus: false,
+                    ownerOnly: false
+                },
+                {
                     key: 'ticket_panel',
                     title: '🎫 Ticket Panel',
                     desc: 'Send the ticket portal panel to a channel so members can open tickets.',
@@ -860,6 +893,37 @@
                 return `<option value="${channelId}" ${isDefault}>#${channelName}</option>`;
             }).join('') || '<option value="" disabled selected>No channels returned by backend</option>';
 
+            if (moduleKey === 'antiping') {
+                modalTitle.innerText = 'Anti-Ping';
+                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
+                document.getElementById('config-modal').classList.remove('hidden');
+
+                let current = { roleId: null, deleteOffenderMessage: true };
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/antiping`, {
+                        headers: { ...NGROK_HEADERS }
+                    });
+                    if (res.ok) current = await res.json();
+                } catch (e) {
+                    console.warn('Could not load anti-ping configuration.', e);
+                }
+
+                const roleOptionsHtml = buildOptionsHtml(serverRoles, current.roleId, '-- None (disabled) --');
+
+                modalBody.innerHTML = `
+                    <div class="form-group">
+                        <label>Protected Role</label>
+                        <select id="cfg-antiping-role">${roleOptionsHtml}</select>
+                    </div>
+                    <div class="check-row">
+                        <input type="checkbox" id="cfg-antiping-delete" ${current.deleteOffenderMessage !== false ? 'checked' : ''}>
+                        <label for="cfg-antiping-delete">Delete the message that pinged the protected role</label>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 13px;">Anyone who pings this role, or someone who has it, gets a warning embed that auto-deletes after 5 seconds. Replying to (and pinging) a protected member shows the same warning with a reminder GIF attached.</p>
+                `;
+                return;
+            }
+
             if (moduleKey === 'customization') {
                 modalTitle.innerText = 'Ocean+ Per-Server Bot Profile';
                 modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
@@ -938,6 +1002,30 @@
         }
 
         async function saveConfigModal() {
+            if (activeConfigModule === 'antiping') {
+                const roleId = document.getElementById('cfg-antiping-role').value || null;
+                const deleteOffenderMessage = document.getElementById('cfg-antiping-delete').checked;
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/antiping`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                        body: JSON.stringify({ roleId, deleteOffenderMessage })
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok) {
+                        alert('Anti-ping settings saved!');
+                        closeConfigModal();
+                    } else {
+                        alert(data.error || 'Failed to save anti-ping settings.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error connecting to backend server.');
+                }
+                return;
+            }
+
             let configData = {};
 
             if (activeConfigModule === 'customization') {
