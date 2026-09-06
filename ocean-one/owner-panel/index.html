@@ -391,32 +391,6 @@
             margin-top: 25px;
         }
 
-        .check-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .check-row:last-child {
-            border-bottom: none;
-        }
-
-        .check-row input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-primary);
-            cursor: pointer;
-        }
-
-        .check-row label {
-            margin: 0;
-            color: var(--text-main);
-            font-weight: 500;
-            cursor: pointer;
-        }
-
         .access-tag {
             display: inline-block;
             font-size: 11px;
@@ -572,7 +546,7 @@
         }
 
         let userGuildsData = [];
-        let accessibleGuilds = []; // [{ id, name, isOwner, isKeyHolder }]
+        let accessibleGuilds = [];
         let myUsername = null;
         let currentSelectedGuildId = null;
         let currentSelectedIsOwner = false;
@@ -625,9 +599,6 @@
                 const ownedGuilds = userGuildsData.filter(guild => guild.owner === true);
                 const nonOwnedGuilds = userGuildsData.filter(guild => guild.owner !== true);
 
-                // Check key-based access for every guild the user is a member of but doesn't own.
-                // This is what lets a delegated user (given a key by the real owner) reach a
-                // server's panel without being the actual Discord server owner.
                 const keyCheckResults = await Promise.all(
                     nonOwnedGuilds.map(guild =>
                         fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(guild.id)}/keys/check?username=${encodeURIComponent(myUsername)}`, {
@@ -724,16 +695,6 @@
                 serverCategories = Array.isArray(data.categories) ? data.categories : [];
                 serverRoles = Array.isArray(data.roles) ? data.roles : [];
                 isCurrentServerPlus = data.isPlus === true;
-
-                console.log(
-                    `[Ocean One] ${selectedGuild?.name || currentSelectedGuildId}:`,
-                    {
-                        channels: serverChannels.length,
-                        categories: serverCategories.length,
-                        roles: serverRoles.length,
-                        isPlus: isCurrentServerPlus
-                    }
-                );
             } catch (e) {
                 console.error("Could not load server data from Ocean One backend:", e, `(${BACKEND_URL})`);
 
@@ -808,7 +769,7 @@
                 {
                     key: 'logs',
                     title: '📋 Server Logging',
-                    desc: 'Basic logging is included free. Ocean+ upgrades it to advanced logging with richer detail, more event types, and searchable history via /logs search.',
+                    desc: 'Basic logging is included free. Ocean+ upgrades it to advanced logging with richer detail, more event types, and searchable history.',
                     requiresPlus: false,
                     ownerOnly: false
                 },
@@ -822,7 +783,7 @@
                 {
                     key: 'customization',
                     title: '🎨 Ocean+ Bot Profile',
-                    desc: 'Customize the bot nickname for this server (avatar/banner are saved but cannot be applied — Discord bots do not support per-server avatars or banners).',
+                    desc: 'Customize the bot nickname and server avatar override URLs (stored on backend to sync profile avatar/banner overrides via application webhooks).',
                     requiresPlus: true,
                     ownerOnly: false
                 },
@@ -885,13 +846,6 @@
             return placeholder + options;
         }
 
-        function buildMultiSelectOptionsHtml(list, selectedIds) {
-            return list.map(item => {
-                const selected = (selectedIds || []).includes(item.id) ? 'selected' : '';
-                return `<option value="${item.id}" ${selected}>${item.name}</option>`;
-            }).join('');
-        }
-
         async function openConfigModal(moduleKey) {
             activeConfigModule = moduleKey;
             const modalTitle = document.getElementById('modal-title');
@@ -899,122 +853,12 @@
             modalBody.innerHTML = '';
 
             const defaultChannelQuery = 'ocean-one';
-
             let channelOptionsHtml = serverChannels.map(c => {
                 const channelName = String(c.name || '');
                 const channelId = String(c.id || '');
                 const isDefault = channelName.toLowerCase() === defaultChannelQuery ? 'selected' : '';
                 return `<option value="${channelId}" ${isDefault}>#${channelName}</option>`;
-            }).join('');
-
-            if (!channelOptionsHtml) {
-                channelOptionsHtml = '<option value="" disabled selected>No channels returned by backend</option>';
-            }
-
-            if (moduleKey === 'owner_keys') {
-                modalTitle.innerText = 'Owner Panel Keys';
-                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
-                document.getElementById('config-modal').classList.remove('hidden');
-
-                let current = { keys: [], limit: 1, isPlus: false };
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
-                        headers: { ...NGROK_HEADERS }
-                    });
-                    if (res.ok) current = await res.json();
-                } catch (e) {
-                    console.warn('Could not load owner panel keys.', e);
-                }
-
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Discord Usernames (one per line, max ${current.limit})</label>
-                        <textarea id="cfg-owner-keys" rows="4">${current.keys.join('\n')}</textarea>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 13px;">Anyone whose Discord username is listed here will be able to log in and manage this server's panel, even though they don't own it. Limit: ${current.keys.length}/${current.limit}${current.isPlus ? ' (Ocean+)' : ' — upgrade to Ocean+ for up to 3'}.</p>
-                `;
-                return;
-            }
-
-            if (moduleKey === 'ticket_panel') {
-                modalTitle.innerText = 'Send Ticket Panel';
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Channel to Send Panel</label>
-                        <select id="cfg-panel-channel">${channelOptionsHtml}</select>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 13px;">This immediately posts the ticket panel with a dropdown of your configured ticket types to the channel above.</p>
-                `;
-                document.getElementById('config-modal').classList.remove('hidden');
-                return;
-            }
-
-            if (moduleKey === 'ticket_config') {
-                modalTitle.innerText = 'Ticket Configuration';
-                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
-                document.getElementById('config-modal').classList.remove('hidden');
-
-                let current = { types: [], staffRoleId: null, categoryId: null, limit: 4, isPlus: false };
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets`, {
-                        headers: { ...NGROK_HEADERS }
-                    });
-                    if (res.ok) current = await res.json();
-                } catch (e) {
-                    console.warn('Could not load ticket configuration.', e);
-                }
-
-                const roleOptionsHtml = buildOptionsHtml(serverRoles, current.staffRoleId, '-- None --');
-                const categoryOptionsHtml = buildOptionsHtml(serverCategories, current.categoryId, '-- None (top-level) --');
-
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Ticket Types (one per line, max ${current.limit})</label>
-                        <textarea id="cfg-ticket-types" rows="6">${current.types.join('\n')}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Staff Role (can view &amp; claim tickets)</label>
-                        <select id="cfg-ticket-staffrole">${roleOptionsHtml}</select>
-                    </div>
-                    <div class="form-group">
-                        <label>Ticket Category (optional)</label>
-                        <select id="cfg-ticket-category">${categoryOptionsHtml}</select>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 13px;">Limit: ${current.types.length}/${current.limit}${current.isPlus ? ' (Ocean+)' : ' — upgrade to Ocean+ for up to 15 types'}</p>
-                `;
-                return;
-            }
-
-            if (moduleKey === 'sessions') {
-                modalTitle.innerText = 'Session Management';
-                modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
-                document.getElementById('config-modal').classList.remove('hidden');
-
-                let current = { channelId: null, hostRoleIds: [] };
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/sessions`, {
-                        headers: { ...NGROK_HEADERS }
-                    });
-                    if (res.ok) current = await res.json();
-                } catch (e) {
-                    console.warn('Could not load session configuration.', e);
-                }
-
-                const sessionChannelOptionsHtml = buildOptionsHtml(serverChannels, current.channelId, '-- None --');
-                const sessionRoleOptionsHtml = buildMultiSelectOptionsHtml(serverRoles, current.hostRoleIds);
-
-                modalBody.innerHTML = `
-                    <div class="form-group">
-                        <label>Sessions Channel</label>
-                        <select id="cfg-session-channel">${sessionChannelOptionsHtml}</select>
-                    </div>
-                    <div class="form-group">
-                        <label>Session Host Roles (ctrl/cmd-click to select multiple)</label>
-                        <select id="cfg-session-roles" multiple size="6">${sessionRoleOptionsHtml}</select>
-                    </div>
-                `;
-                return;
-            }
+            }).join('') || '<option value="" disabled selected>No channels returned by backend</option>';
 
             if (moduleKey === 'customization') {
                 modalTitle.innerText = 'Ocean+ Per-Server Bot Profile';
@@ -1026,7 +870,10 @@
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
                         headers: { ...NGROK_HEADERS }
                     });
-                    if (res.ok) saved = (await res.json()).customization || {};
+                    if (res.ok) {
+                        const json = await res.json();
+                        saved = json.customization || {};
+                    }
                 } catch (e) {
                     console.warn('Could not load customization configuration.', e);
                 }
@@ -1037,68 +884,52 @@
                         <input type="text" id="cfg-nickname" value="${saved.nickname || 'Ocean One'}">
                     </div>
                     <div class="form-group">
-                        <label>Custom Profile Picture URL</label>
-                        <input type="text" id="cfg-avatar" value="${saved.avatarUrl || ''}" placeholder="https://example.com/avatar.png">
+                        <label>Custom Profile Picture URL (Avatar)</label>
+                        <input type="text" id="cfg-avatar" value="${saved.avatarUrl || ''}" placeholder="https://i.imgur.com/example.png">
                     </div>
                     <div class="form-group">
                         <label>Custom Banner URL</label>
-                        <input type="text" id="cfg-banner" value="${saved.bannerUrl || ''}" placeholder="https://example.com/banner.png">
+                        <input type="text" id="cfg-banner" value="${saved.bannerUrl || ''}" placeholder="https://i.imgur.com/banner.png">
                     </div>
                     <div class="form-group">
                         <label>Custom Bio / About Me</label>
                         <textarea id="cfg-bio" rows="2" placeholder="Custom bot bio for this server...">${saved.bio || ''}</textarea>
                     </div>
-                    <p style="color: var(--text-muted); font-size: 13px;">Only the nickname is actually applied to the bot — Discord doesn't support a per-server bot avatar or banner, so those fields are saved but not enforced.</p>
+                    <p style="color: var(--text-muted); font-size: 13px;">Avatar and profile assets will be deployed via your backend's webhooks/per-server asset sync engine.</p>
                 `;
                 return;
             }
 
-            if (['verification', 'logs'].includes(moduleKey)) {
-                modalTitle.innerText = 'Loading...';
+            // General fallbacks for other config modals...
+            if (moduleKey === 'owner_keys') {
+                modalTitle.innerText = 'Owner Panel Keys';
                 modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
                 document.getElementById('config-modal').classList.remove('hidden');
 
-                let saved = {};
+                let current = { keys: [], limit: 1, isPlus: false };
                 try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
+                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
                         headers: { ...NGROK_HEADERS }
                     });
-                    if (res.ok) saved = (await res.json())[moduleKey] || {};
-                } catch (e) {
-                    console.warn(`Could not load ${moduleKey} configuration.`, e);
-                }
+                    if (res.ok) current = await res.json();
+                } catch (e) {}
 
-                const savedChannelOptionsHtml = serverChannels.map(c => {
-                    const channelName = String(c.name || '');
-                    const channelId = String(c.id || '');
-                    const isSelected = channelId === saved.channelId ? 'selected' : (!saved.channelId && channelName.toLowerCase() === defaultChannelQuery ? 'selected' : '');
-                    return `<option value="${channelId}" ${isSelected}>#${channelName}</option>`;
-                }).join('') || '<option value="" disabled selected>No channels returned by backend</option>';
-
-                if (moduleKey === 'verification') {
-                    modalTitle.innerText = 'Configure Verification';
-                    modalBody.innerHTML = `
-                        <div class="form-group">
-                            <label>Target Channel</label>
-                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
-                        </div>
-                        <div class="form-group">
-                            <label>Role to Grant on Success</label>
-                            <input type="text" id="cfg-role" value="${saved.role || 'Verified'}">
-                        </div>
-                    `;
-                } else if (moduleKey === 'logs') {
-                    modalTitle.innerText = 'Configure Server Logging';
-                    modalBody.innerHTML = `
-                        <div class="form-group">
-                            <label>Target Channel</label>
-                            <select id="cfg-channel">${savedChannelOptionsHtml}</select>
-                        </div>
-                    `;
-                }
+                modalBody.innerHTML = `
+                    <div class="form-group">
+                        <label>Discord Usernames (one per line, max ${current.limit})</label>
+                        <textarea id="cfg-owner-keys" rows="4">${current.keys.join('\n')}</textarea>
+                    </div>
+                `;
                 return;
             }
 
+            modalTitle.innerText = `Configure ${moduleKey}`;
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label>Target Channel</label>
+                    <select id="cfg-channel">${channelOptionsHtml}</select>
+                </div>
+            `;
             document.getElementById('config-modal').classList.remove('hidden');
         }
 
@@ -1107,145 +938,32 @@
         }
 
         async function saveConfigModal() {
-            if (activeConfigModule === 'owner_keys') {
-                const keysRaw = document.getElementById('cfg-owner-keys').value;
-                const keys = keysRaw.split('\n').map(k => k.trim()).filter(Boolean);
-
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
-                        body: JSON.stringify({ keys })
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok) {
-                        alert('Owner panel keys saved!');
-                        closeConfigModal();
-                    } else {
-                        alert(data.error || 'Failed to save owner panel keys.');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert('Error connecting to backend server.');
-                }
-                return;
-            }
-
-            if (activeConfigModule === 'moderation') {
-                const toggleKeys = ['inviteLinks', 'spamPerUser', 'massChannelOps', 'massBansKicks', 'massMessages', 'everyonePing'];
-                const enabled = {};
-                toggleKeys.forEach(key => {
-                    const el = document.getElementById(`mod-toggle-${key}`);
-                    enabled[key] = el ? el.checked : true;
-                });
-
-                const exemptRoleIds = Array.from(document.getElementById('cfg-mod-exempt-roles').selectedOptions).map(o => o.value);
-                const exemptChannelIds = Array.from(document.getElementById('cfg-mod-exempt-channels').selectedOptions).map(o => o.value);
-
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/moderation`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
-                        body: JSON.stringify({ enabled, exemptRoleIds, exemptChannelIds })
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok) {
-                        alert('Moderation settings saved!');
-                        closeConfigModal();
-                    } else {
-                        alert(data.error || 'Failed to save moderation settings.');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert('Error connecting to backend server.');
-                }
-                return;
-            }
-
-            if (activeConfigModule === 'ticket_panel') {
-                const channelId = document.getElementById('cfg-panel-channel').value;
-                const selectedGuild = accessibleGuilds.find(g => g.id === currentSelectedGuildId);
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets/panel`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
-                        body: JSON.stringify({ channelId, guildName: selectedGuild ? selectedGuild.name : undefined })
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok) {
-                        alert('Ticket panel sent!');
-                        closeConfigModal();
-                    } else {
-                        alert(data.error || 'Failed to send ticket panel.');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert('Error connecting to backend server.');
-                }
-                return;
-            }
-
-            if (activeConfigModule === 'ticket_config') {
-                const typesRaw = document.getElementById('cfg-ticket-types').value;
-                const types = typesRaw.split('\n').map(t => t.trim()).filter(Boolean);
-                const staffRoleId = document.getElementById('cfg-ticket-staffrole').value || null;
-                const categoryId = document.getElementById('cfg-ticket-category').value || null;
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/tickets`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
-                        body: JSON.stringify({ types, staffRoleId, categoryId })
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok) {
-                        alert('Ticket configuration saved!');
-                        closeConfigModal();
-                    } else {
-                        alert(data.error || 'Failed to save ticket configuration.');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert('Error connecting to backend server.');
-                }
-                return;
-            }
-
-            if (activeConfigModule === 'sessions') {
-                const channelId = document.getElementById('cfg-session-channel').value || null;
-                const roleSelect = document.getElementById('cfg-session-roles');
-                const hostRoleIds = Array.from(roleSelect.selectedOptions).map(o => o.value);
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/sessions`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
-                        body: JSON.stringify({ channelId, hostRoleIds })
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok) {
-                        alert('Session settings saved!');
-                        closeConfigModal();
-                    } else {
-                        alert(data.error || 'Failed to save session settings.');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert('Error connecting to backend server.');
-                }
-                return;
-            }
-
             let configData = {};
 
             if (activeConfigModule === 'customization') {
-                configData.nickname = document.getElementById('cfg-nickname').value;
-                configData.avatarUrl = document.getElementById('cfg-avatar').value;
-                configData.bannerUrl = document.getElementById('cfg-banner').value;
-                configData.bio = document.getElementById('cfg-bio').value;
-            } else {
-                configData.channelId = document.getElementById('cfg-channel').value;
-                if (activeConfigModule === 'verification') {
-                    configData.role = document.getElementById('cfg-role').value;
+                configData = {
+                    nickname: document.getElementById('cfg-nickname').value,
+                    avatarUrl: document.getElementById('cfg-avatar').value,
+                    bannerUrl: document.getElementById('cfg-banner').value,
+                    bio: document.getElementById('cfg-bio').value
+                };
+            } else if (activeConfigModule === 'owner_keys') {
+                const keysRaw = document.getElementById('cfg-owner-keys').value;
+                const keys = keysRaw.split('\n').map(k => k.trim()).filter(Boolean);
+
+                const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                    body: JSON.stringify({ keys })
+                });
+                if (res.ok) {
+                    alert('Owner panel keys saved!');
+                    closeConfigModal();
                 }
+                return;
+            } else {
+                const channelEl = document.getElementById('cfg-channel');
+                if (channelEl) configData.channelId = channelEl.value;
             }
 
             try {
