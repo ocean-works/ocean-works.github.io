@@ -11,7 +11,7 @@
     function login() {
         const returnPath = currentReturnPath();
         sessionStorage.setItem(returnKey, returnPath);
-        const authUrl = new URL('https://discord.com/api/oauth2/authorize');
+        const authUrl = new URL('https://discord.com/oauth2/authorize');
         authUrl.searchParams.set('client_id', clientId);
         authUrl.searchParams.set('redirect_uri', `${window.location.origin}${ownerPanelPath}`);
         authUrl.searchParams.set('response_type', 'token');
