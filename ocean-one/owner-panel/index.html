@@ -589,8 +589,14 @@
             const accessTokenFromUrl = fragment.get('access_token');
 
             if (accessTokenFromUrl) {
+                const returnPath = fragment.get('state') || sessionStorage.getItem('auth_return');
                 sessionStorage.setItem('discord_token', accessTokenFromUrl);
+                sessionStorage.removeItem('auth_return');
                 window.location.hash = '';
+                if (returnPath && returnPath !== window.location.pathname) {
+                    window.location.replace(`${window.location.origin}${returnPath}`);
+                    return;
+                }
                 fetchUserData(accessTokenFromUrl);
             } else {
                 const savedToken = sessionStorage.getItem('discord_token');

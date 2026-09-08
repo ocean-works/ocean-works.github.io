@@ -52,6 +52,9 @@ header, .top-bar { background: var(--ow-night) !important; border-color: var(--o
 .sidebar-brand span, .sidebar-brand span:last-child, .logo span { color: var(--ow-cyan) !important; }
 .sidebar-menu a, .links a, .footer-links a { color: var(--ow-muted) !important; }
 .sidebar-menu a:hover, .sidebar-menu a.active, .links a:hover, .footer-links a:hover { background: rgba(85,214,210,.1) !important; color: var(--ow-copy) !important; border-color: var(--ow-cyan) !important; }
+.auth-link { align-items: center; display: inline-flex; gap: 8px; }
+.auth-profile { color: var(--ow-copy) !important; font-weight: 700; }
+.auth-avatar { border: 2px solid var(--ow-cyan); border-radius: 50%; height: 28px; object-fit: cover; width: 28px; }
 .section, .main-content { position: relative; }
 footer { border-color: var(--ow-line) !important; }
 
