@@ -1,8 +1,9 @@
 (() => {
     const clientId = '1530208568392028302';
     const ownerPanelPath = '/ocean-one/owner-panel/';
-    const tokenKey = 'discord_token';
+    const sessionKey = 'oceanworks_discord_session';
     const returnKey = 'auth_return';
+    const sessionDuration = 7 * 24 * 60 * 60 * 1000;
 
     function currentReturnPath() {
         return `${window.location.pathname}${window.location.search}${window.location.hash}`;
@@ -21,8 +22,23 @@
     }
 
     function logout() {
-        sessionStorage.removeItem(tokenKey);
+        localStorage.removeItem(sessionKey);
+        sessionStorage.removeItem('discord_token');
         window.location.reload();
+    }
+
+    function getSession() {
+        try {
+            const session = JSON.parse(localStorage.getItem(sessionKey) || 'null');
+            if (!session?.token || !session.expiresAt || Date.now() >= session.expiresAt) {
+                localStorage.removeItem(sessionKey);
+                return null;
+            }
+            return session;
+        } catch (error) {
+            localStorage.removeItem(sessionKey);
+            return null;
+        }
     }
 
     function setProfile(user) {
@@ -50,8 +66,8 @@
     }
 
     async function loadProfile() {
-        const token = sessionStorage.getItem(tokenKey);
-        if (!token) {
+        const session = getSession();
+        if (!session) {
             document.querySelectorAll('.auth-link').forEach((link) => {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -63,12 +79,12 @@
 
         try {
             const response = await fetch('https://discord.com/api/users/@me', {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${session.token}` }
             });
             if (!response.ok) throw new Error('Discord session expired');
             setProfile(await response.json());
         } catch (error) {
-            sessionStorage.removeItem(tokenKey);
+            localStorage.removeItem(sessionKey);
             document.querySelectorAll('.auth-link').forEach((link) => {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
