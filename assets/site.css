@@ -54,7 +54,35 @@ header, .top-bar { background: var(--ow-night) !important; border-color: var(--o
 .sidebar-menu a:hover, .sidebar-menu a.active, .links a:hover, .footer-links a:hover { background: rgba(85,214,210,.1) !important; color: var(--ow-copy) !important; border-color: var(--ow-cyan) !important; }
 .section, .main-content { position: relative; }
 footer { border-color: var(--ow-line) !important; }
+
+/* Keep every public page on the same shell as the root page. */
+body:has(.app-layout) { display: block !important; min-height: 100vh; }
+.app-layout { display: block !important; margin-top: 0 !important; }
+.top-bar { display: none !important; }
+sidebar, .sidebar { display: none !important; }
+.main-content { margin-left: 0 !important; padding: 0 24px !important; width: auto !important; }
+.main-content > .hero, .main-content > .content-container { margin: 0 auto !important; max-width: 1100px !important; width: 100% !important; }
+.main-content > .hero { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 80px 0 60px !important; text-align: left !important; }
+.main-content > .hero h1 { font-size: 3rem !important; margin-bottom: 10px !important; }
+.main-content > .hero p { max-width: 700px; }
+.main-content > .section { max-width: 1100px !important; margin: 0 auto !important; padding: 32px 0 !important; }
+.main-content > footer { max-width: 1100px !important; margin: 60px auto 0 !important; }
+.main-content > .content-container { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 80px 0 32px !important; text-align: left !important; }
+.main-content > .content-container h1 { font-size: 3rem !important; margin-bottom: 10px !important; }
+.main-content > .content-container > div:not(.hidden) { max-width: 700px; }
+.features-grid, .modules-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important; }
+.feature-card, .module-card { border-radius: 12px !important; padding: 24px !important; }
+.plus-section, .add-bot, .add-beacon { border-radius: 12px !important; padding: 32px !important; text-align: left !important; }
+body > .container { max-width: 1100px !important; padding: 80px 24px 32px !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+body > .container h1 { border-bottom: 0 !important; font-size: 3rem !important; padding-bottom: 0 !important; }
+body > nav { max-width: 1100px !important; padding: 0 24px; }
+.docs-shell { max-width: 1100px !important; }
+.docs-hero h1 { font-size: 3rem !important; }
+
 @media (max-width: 768px) {
     .container { padding-left: 18px !important; padding-right: 18px !important; }
     .hero h1 { font-size: 2.25rem !important; }
+    .main-content { padding: 0 18px !important; }
+    .main-content > .hero, .main-content > .content-container { padding: 50px 0 !important; }
+    .main-content > .hero h1, .main-content > .content-container h1, body > .container h1, .docs-hero h1 { font-size: 2.25rem !important; }
 }
