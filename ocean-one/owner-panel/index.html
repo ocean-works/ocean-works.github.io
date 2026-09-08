@@ -475,6 +475,7 @@
             h1 { font-size: 1.8rem; }
         }
     </style>
+    <link rel="stylesheet" href="../../assets/site.css">
 </head>
 <body>
     <div class="top-bar"></div>
@@ -492,7 +493,7 @@
             </ul>
             <div class="sidebar-footer">
                 <a class="logout-link hidden" id="logout-btn" onclick="logoutSession()">Logout / Switch Account</a>
-                <div>&copy; 2026 OceanWorks</div>
+                <div>&copy; 2026 Oceanworks</div>
             </div>
         </sidebar>
 
@@ -549,7 +550,7 @@
 
             <!-- Footer -->
             <footer>
-                <div>&copy; 2026 OceanWorks. All rights reserved.</div>
+                    <div>&copy; 2026 Oceanworks. All rights reserved.</div>
                 <div class="footer-links">
                     <a href="/privacypolicy">Privacy Policy</a>
                     <a href="/tos">Terms of Service</a>
@@ -587,11 +588,11 @@
             const accessTokenFromUrl = fragment.get('access_token');
 
             if (accessTokenFromUrl) {
-                localStorage.setItem('discord_token', accessTokenFromUrl);
+                sessionStorage.setItem('discord_token', accessTokenFromUrl);
                 window.location.hash = '';
                 fetchUserData(accessTokenFromUrl);
             } else {
-                const savedToken = localStorage.getItem('discord_token');
+                const savedToken = sessionStorage.getItem('discord_token');
                 if (savedToken) {
                     fetchUserData(savedToken);
                 }
@@ -664,7 +665,7 @@
 
             } catch (err) {
                 console.error(err);
-                localStorage.removeItem('discord_token');
+                sessionStorage.removeItem('discord_token');
                 document.getElementById('logout-btn').classList.add('hidden');
                 document.getElementById('selector-section').classList.add('hidden');
                 document.getElementById('login-section').classList.remove('hidden');
@@ -672,7 +673,7 @@
         }
 
         function logoutSession() {
-            localStorage.removeItem('discord_token');
+            sessionStorage.removeItem('discord_token');
             window.location.href = REDIRECT_URI;
         }
 

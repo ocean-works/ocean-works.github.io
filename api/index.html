@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+    <title>Oceanworks API</title>
+</head>
+<body>
+    <p>Returning to Oceanworks...</p>
+    <script>
+        const apiOrigin = 'https://legibly-getaway-demote.ngrok-free.dev';
+        const event = JSON.stringify({ path: window.location.pathname, timestamp: new Date().toISOString() });
+        try {
+            navigator.sendBeacon(`${apiOrigin}/api/access-attempt`, new Blob([event], { type: 'text/plain' }));
+        } catch (error) {
+            console.warn('Access audit unavailable.');
+        }
+        alert('The API is not a public website. Returning you to Oceanworks.');
+        window.location.replace('https://ocean-works.github.io/');
+    </script>
+</body>
+</html>

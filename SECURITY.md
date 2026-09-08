@@ -1,0 +1,16 @@
+# Security requirements
+
+The static site can redirect casual visits to `/api/`, mark routes as `noindex`, and send a best-effort access audit event. Those measures are not API security. The ngrok-backed service must enforce these controls itself:
+
+- Allow browser requests only from `https://ocean-works.github.io` using strict CORS. CORS is not authentication.
+- Require authenticated, short-lived server-side sessions or signed access tokens on every protected route.
+- Reject requests without valid authentication before reading or mutating data.
+- Validate `Origin` and `Referer` as additional signals, never as the only authorization check.
+- Add rate limiting per IP, account, route, and guild; cap request bodies and response sizes.
+- Treat `ngrok-skip-browser-warning` as harmless routing metadata, never as a security credential.
+- Record access attempts server-side with timestamp, route, status, account ID when known, and a privacy-conscious client fingerprint.
+- Handle `OPTIONS` preflight separately and never allow wildcard origins with credentials.
+- Use HTTPS, rotate secrets, keep OAuth client secrets off this repository, and configure Discord OAuth with exact redirect URIs.
+- Return generic errors to clients and keep detailed diagnostics in server logs.
+
+The `/api/access-attempt` endpoint should accept only a small JSON payload, apply rate limits, avoid storing raw tokens, and return `204 No Content`.

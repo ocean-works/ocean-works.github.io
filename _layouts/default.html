@@ -1,5 +1,24 @@
-<html>
-	<head>
-		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-	</head>
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{{ page.title | default: 'Oceanworks' }}</title>
+	<link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+</head>
+<body>
+	<header>
+		<div class="container">
+			<nav class="nav">
+				<a class="logo" href="{{ '/' | relative_url }}">Ocean<span>works</span></a>
+				<div class="links">
+					<a href="{{ '/ocean-one/' | relative_url }}">Ocean One</a>
+					<a href="{{ '/beacon/' | relative_url }}">Beacon</a>
+					<a href="{{ '/ocean-one/owner-panel/' | relative_url }}">Sign in</a>
+				</div>
+			</nav>
+		</div>
+	</header>
+	<main class="container">{{ content }}</main>
+</body>
 </html>

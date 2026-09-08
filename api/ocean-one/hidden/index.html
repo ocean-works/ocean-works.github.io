@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="refresh" content="0; url=https://ocean-works.github.io/">
+    <title>Ocean One</title>
+    <script>
+        const auditUrl = 'https://legibly-getaway-demote.ngrok-free.dev/api/access-attempt';
+        const auditPayload = JSON.stringify({ path: window.location.pathname, timestamp: new Date().toISOString() });
+        try {
+            navigator.sendBeacon(auditUrl, new Blob([auditPayload], { type: 'text/plain' }));
+        } catch (error) {
+            console.warn('Access audit unavailable.');
+        }
+        alert('This API route is private. Returning you to Oceanworks.');
+        window.location.replace('https://ocean-works.github.io/');
+    </script>
+</head>
+<body>
+    <p>Opening Ocean One...</p>
+</body>
+</html>
