@@ -33,7 +33,21 @@ body::before {
 }
 h1, h2, h3, .logo, .sidebar-brand { font-family: 'Space Grotesk', sans-serif !important; letter-spacing: -.02em; }
 a { color: var(--ow-cyan); }
-header, .top-bar { background: var(--ow-night) !important; border-color: var(--ow-line) !important; }
+header {
+    background: rgba(11, 31, 46, .96) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--ow-line) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.container { margin: 0 auto; max-width: 1100px; padding: 0 24px; }
+.nav { align-items: center; display: flex; height: 72px; justify-content: space-between; }
+.logo { color: var(--ow-copy) !important; font-size: 1.2rem; font-weight: 700; letter-spacing: .3px; text-decoration: none; }
+.logo span { color: var(--ow-cyan) !important; }
+.links { align-items: center; display: flex; gap: 22px; }
+.links a { color: var(--ow-muted) !important; font-size: .95rem; text-decoration: none; }
+.links a:hover { background: transparent !important; color: var(--ow-copy) !important; }
 .top-bar { background: linear-gradient(90deg, var(--ow-cyan), var(--ow-coral)) !important; height: 4px !important; }
 .card, .updates, .hero, .feature-card, .plus-section, .add-bot, .add-beacon, .content-container, .container > .container {
     background: rgba(16, 43, 61, .82) !important;
@@ -85,6 +99,8 @@ body > nav { max-width: 1100px !important; padding: 0 24px; }
 @media (max-width: 768px) {
     .container { padding-left: 18px !important; padding-right: 18px !important; }
     .hero h1 { font-size: 2.25rem !important; }
+    .nav { height: auto; min-height: 72px; }
+    .links { flex-wrap: wrap; gap: 10px 14px; justify-content: flex-end; }
     .main-content { padding: 0 18px !important; }
     .main-content > .hero, .main-content > .content-container { padding: 50px 0 !important; }
     .main-content > .hero h1, .main-content > .content-container h1, body > .container h1, .docs-hero h1 { font-size: 2.25rem !important; }
