@@ -584,6 +584,23 @@
         let serverRoles = [];
         let activeConfigModule = '';
 
+        // Helper to get authenticated headers
+        function getAuthHeaders(additionalHeaders = {}) {
+            let token = null;
+            try {
+                const savedSession = JSON.parse(localStorage.getItem('oceanworks_discord_session') || 'null');
+                if (savedSession && savedSession.token) {
+                    token = savedSession.token;
+                }
+            } catch (e) {}
+
+            return {
+                ...NGROK_HEADERS,
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                ...additionalHeaders
+            };
+        }
+
         window.onload = async () => {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessTokenFromUrl = fragment.get('access_token');
@@ -646,7 +663,7 @@
                 const keyCheckResults = await Promise.all(
                     nonOwnedGuilds.map(guild =>
                         fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(guild.id)}/keys/check?username=${encodeURIComponent(myUsername)}`, {
-                            headers: { ...NGROK_HEADERS }
+                            headers: getAuthHeaders()
                         })
                             .then(res => res.ok ? res.json() : { hasAccess: false })
                             .catch(() => ({ hasAccess: false }))
@@ -715,10 +732,7 @@
                     `${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/channels`,
                     {
                         method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            ...NGROK_HEADERS
-                        }
+                        headers: getAuthHeaders({ 'Accept': 'application/json' })
                     }
                 );
 
@@ -919,7 +933,7 @@
                 let current = { roleId: null, deleteOffenderMessage: true };
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/antiping`, {
-                        headers: { ...NGROK_HEADERS }
+                        headers: getAuthHeaders()
                     });
                     if (res.ok) current = await res.json();
                 } catch (e) {
@@ -950,7 +964,7 @@
                 let saved = {};
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
-                        headers: { ...NGROK_HEADERS }
+                        headers: getAuthHeaders()
                     });
                     if (res.ok) {
                         const json = await res.json();
@@ -982,7 +996,6 @@
                 return;
             }
 
-            // General fallbacks for other config modals...
             if (moduleKey === 'owner_keys') {
                 modalTitle.innerText = 'Owner Panel Keys';
                 modalBody.innerHTML = `<p style="color: var(--text-muted);">Loading current settings...</p>`;
@@ -991,7 +1004,7 @@
                 let current = { keys: [], limit: 1, isPlus: false };
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
-                        headers: { ...NGROK_HEADERS }
+                        headers: getAuthHeaders()
                     });
                     if (res.ok) current = await res.json();
                 } catch (e) {}
@@ -1027,7 +1040,7 @@
                 try {
                     const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/antiping`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                         body: JSON.stringify({ roleId, deleteOffenderMessage })
                     });
                     const data = await res.json().catch(() => ({}));
@@ -1059,7 +1072,7 @@
 
                 const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/keys`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify({ keys })
                 });
                 if (res.ok) {
@@ -1075,7 +1088,7 @@
             try {
                 const res = await fetch(`${BACKEND_URL}/api/guilds/${encodeURIComponent(currentSelectedGuildId)}/config`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', ...NGROK_HEADERS },
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify({ moduleKey: activeConfigModule, configData })
                 });
 
