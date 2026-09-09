@@ -6,14 +6,14 @@
     <meta http-equiv="refresh" content="0; url=https://ocean-works.github.io/">
     <title>Ocean One</title>
     <script>
-        const auditUrl = 'https://legibly-getaway-demote.ngrok-free.dev/api/access-attempt';
+        const auditUrl = 'https://ocean-works.github.io/api/ocean-one/hidden/api/access-attempt';
         const auditPayload = JSON.stringify({ path: window.location.pathname, timestamp: new Date().toISOString() });
         try {
             navigator.sendBeacon(auditUrl, new Blob([auditPayload], { type: 'text/plain' }));
         } catch (error) {
             console.warn('Access audit unavailable.');
         }
-        alert('This API route is private. Returning you to Oceanworks.');
+        alert('404: Acencess');
         window.location.replace('https://ocean-works.github.io/');
     </script>
 </head>
