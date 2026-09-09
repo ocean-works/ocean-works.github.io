@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../../../assets/site.css">
     <script src="../../../assets/alerts.js"></script>
     <script>
-        const auditUrl = 'https://legibly-getaway-demote.ngrok-free.dev/api/access-attempt';
+        const auditUrl = '/api/ocean-one/hidden/api/access-attempt';
         const auditPayload = JSON.stringify({ path: window.location.pathname, timestamp: new Date().toISOString() });
         try {
             navigator.sendBeacon(auditUrl, new Blob([auditPayload], { type: 'text/plain' }));
