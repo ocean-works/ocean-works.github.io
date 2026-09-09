@@ -5,6 +5,9 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Ocean One</title>
     <link rel="stylesheet" href="../../../assets/site.css">
+</head>
+<body>
+    <p>Opening Ocean One...</p>
     <script src="../../../assets/alerts.js"></script>
     <script>
         const auditUrl = 'https://legibly-getaway-demote.ngrok-free.dev/api/access-attempt';
@@ -14,13 +17,8 @@
         } catch (error) {
             console.warn('Access audit unavailable.');
         }
-        window.addEventListener('DOMContentLoaded', () => {
-            OceanworksAlert.show('404: Access denied. This is not a public area.', { title: 'Private route', mark: 'i' });
-            setTimeout(() => window.location.replace('https://ocean-works.github.io/'), 900);
-        });
+        OceanworksAlert.show('404: Access denied. This is not a public area.', { title: 'Private route', mark: 'i' });
+        setTimeout(() => window.location.replace('https://ocean-works.github.io/'), 900);
     </script>
-</head>
-<body>
-    <p>Opening Ocean One...</p>
 </body>
 </html>
