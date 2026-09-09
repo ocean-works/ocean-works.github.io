@@ -8,6 +8,7 @@ function mountOperatorRoutes(app, {
     resolveDiscordUser,
     operatorUserId = process.env.OPERATOR_DISCORD_ID || '1394655096268394592',
     operatorDiscordId = process.env.OPERATOR_DISCORD_ID || '1394655096268394592',
+    operatorUserIds = [operatorUserId, '1408890168928239696'],
     consoleFeed = [],
     executeCommand = async ({ command }) => `Command received: ${command}`
 }) {
@@ -30,7 +31,7 @@ function mountOperatorRoutes(app, {
 
         const resolvedUser = await resolveDiscordUser(token).catch(() => null);
         const user = resolvedUser ? await resolveOperatorIdentity(token, resolvedUser).catch(() => null) : null;
-        if (!user || (user.userId || user.id) !== operatorUserId) {
+        if (!user || !operatorUserIds.includes(user.userId || user.id)) {
             return res.status(403).json({ error: 'Operator access denied.' });
         }
 

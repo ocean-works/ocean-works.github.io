@@ -80,7 +80,7 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
     <script src="../../assets/auth.js"></script>
     <script>
         (() => {
-            const operatorId = '1394655096268394592';
+            const operatorIds = ['1394655096268394592', '1408890168928239696'];
             const backendUrl = 'https://legibly-getaway-demote.ngrok-free.dev';
             const sessionKey = 'oceanworks_discord_session';
             const loginView = document.getElementById('login-view');
@@ -130,7 +130,7 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                 token = saved.token;
                 try {
                     const user = await discordRequest('/users/@me');
-                    if (user.id !== operatorId) { showError('This account is not authorized for operator access.'); return; }
+                    if (!operatorIds.includes(user.id)) { showError('This account is not authorized for operator access.'); return; }
                     if (!(await requireSecurityKey())) return;
                     const guilds = await discordRequest('/users/@me/guilds');
                     document.getElementById('operator-name').textContent = user.global_name || user.username;

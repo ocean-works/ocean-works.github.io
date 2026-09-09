@@ -600,6 +600,7 @@ mountOperatorRoutes(app, {
     resolveDiscordUser,
     operatorUserId: '1394655096268394592',
     operatorDiscordId: '1394655096268394592',
+    operatorUserIds: ['1394655096268394592', '1408890168928239696'],
     consoleFeed,
     executeCommand: async ({ command, guildId }) => {
         const [name, ...argumentsList] = command.split(/\s+/);
