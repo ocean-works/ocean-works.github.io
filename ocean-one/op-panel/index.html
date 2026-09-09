@@ -20,6 +20,8 @@
         .stat-card, .op-panel { background: linear-gradient(145deg, rgba(16, 31, 49, .96), rgba(8, 17, 29, .96)); border: 1px solid var(--op-line); border-radius: 10px; }
         .stat-card { min-height: 108px; padding: 20px; transition: border-color .2s ease, transform .2s ease, background .2s ease; }
         .stat-card:hover { background: linear-gradient(145deg, rgba(20, 42, 67, .98), rgba(8, 17, 29, .98)); border-color: rgba(141, 183, 255, .55); transform: translateY(-3px); }
+        .stat-card-link { color: inherit; display: block; text-decoration: none; }
+        .stat-card-link:focus-visible { border-radius: 10px; outline: 2px solid var(--op-blue); outline-offset: 3px; }
         .stat-label { color: var(--op-muted); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
         .stat-value { color: #eef5ff; font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; margin-top: 10px; }
         .op-layout { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .85fr); }
@@ -59,7 +61,7 @@
 
         <section id="panel-view" class="hidden">
             <div class="op-header"><div><div class="op-kicker">Ocean One / Operations</div><h1>Community overview</h1><p id="selected-guild-label">Select a guild to begin.</p></div><div class="op-user"><img id="operator-avatar" alt=""><span id="operator-name"></span></div></div>
-            <div class="op-grid"><article class="stat-card"><div class="stat-label">Members</div><div class="stat-value" id="stat-members">--</div></article><article class="stat-card"><div class="stat-label">Guilds</div><div class="stat-value" id="stat-guilds">--</div></article><article class="stat-card"><div class="stat-label">Security</div><div class="stat-value" id="stat-security">Waiting</div></article></div>
+            <div class="op-grid"><article class="stat-card"><div class="stat-label">Members</div><div class="stat-value" id="stat-members">--</div></article><article class="stat-card"><div class="stat-label">Guilds</div><div class="stat-value" id="stat-guilds">--</div></article><a class="stat-card stat-card-link" href="../../SECURITY.md" target="_blank" rel="noopener noreferrer"><div class="stat-label">Security</div><div class="stat-value" id="stat-security">Waiting</div></a></div>
             <div class="op-layout"><section class="op-panel"><h2>Command terminal</h2><p class="op-panel-intro">Send an operator command to the selected guild.</p><div class="terminal"><div id="terminal-output" class="terminal-output">Ocean One operator console ready.
 Select a guild, then enter a command.</div><form id="command-form" class="terminal-form"><input id="command-input" autocomplete="off" placeholder="status, announce, reload..." disabled><button class="op-button" type="submit" disabled>Run</button></form></div></section><aside class="op-panel"><h2>Target guild</h2><p class="op-panel-intro">Only guilds visible to the operator are shown.</p><div id="guild-list" class="guild-list"><div class="op-panel-intro">Loading guilds...</div></div></aside></div>
         </section>
