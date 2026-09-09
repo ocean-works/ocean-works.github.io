@@ -106,7 +106,23 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             function showSecurityError(message) { securityError.textContent = message; securityError.classList.remove('hidden'); }
             function print(message) { output.textContent += `\n${message}`; output.scrollTop = output.scrollHeight; }
             async function discordRequest(path) { const response = await fetch(`https://discord.com/api${path}`, { headers: { Authorization: `Bearer ${token}` } }); if (!response.ok) throw new Error('Discord session expired.'); return response.json(); }
-            async function operatorRequest(path, options = {}) { const response = await fetch(`${backendUrl}/api/operator/${path}`, { ...options, mode: 'cors', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...(options.headers || {}) } }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `Operator service returned HTTP ${response.status}.`); return data; }
+            
+            async function operatorRequest(path, options = {}) { 
+                const response = await fetch(`${backendUrl}/api/operator/${path}`, { 
+                    ...options, 
+                    mode: 'cors', 
+                    headers: { 
+                        Authorization: `Bearer ${token}`, 
+                        'Content-Type': 'application/json', 
+                        'ngrok-skip-browser-warning': 'true',
+                        ...(options.headers || {}) 
+                    } 
+                }); 
+                const data = await response.json().catch(() => ({})); 
+                if (!response.ok) throw new Error(data.error || `Operator service returned HTTP ${response.status}.`); 
+                return data; 
+            }
+
             async function securityRequest(path, options = {}) {
                 return operatorRequest(`security/${path}`, options);
             }
