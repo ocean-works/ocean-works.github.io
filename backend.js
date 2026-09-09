@@ -5,12 +5,13 @@ const util = require('util');
 const cors = require('cors');
 const { ActionRowBuilder } = require('discord.js');
 
-const ticketStore = require('./utils/ticketStore');
-const sessionStore = require('./utils/sessionStore');
-const moderationStore = require('./utils/moderationStore');
-const keyStore = require('./utils/keyStore');
+const projectRoot = fs.existsSync(path.join(__dirname, 'utils')) ? __dirname : path.resolve(__dirname, '..');
+const ticketStore = require(path.join(projectRoot, 'utils', 'ticketStore'));
+const sessionStore = require(path.join(projectRoot, 'utils', 'sessionStore'));
+const moderationStore = require(path.join(projectRoot, 'utils', 'moderationStore'));
+const keyStore = require(path.join(projectRoot, 'utils', 'keyStore'));
 const verification = require('./verification');
-const antiPingStore = require('./utils/antiPingStore');
+const antiPingStore = require(path.join(projectRoot, 'utils', 'antiPingStore'));
 const { mountOperatorRoutes } = require('./operator-routes');
 
 const app = express();
