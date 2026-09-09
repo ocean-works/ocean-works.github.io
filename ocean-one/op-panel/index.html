@@ -41,6 +41,10 @@
         .login-card { margin: 90px auto; max-width: 560px; text-align: center; }
         .login-card p { color: var(--op-muted); }
         .error-note { color: #ff9c9c; font-size: .9rem; margin-top: 16px; }
+        .security-card { margin: 90px auto; max-width: 560px; }
+        .security-card input { background: #091321; border: 1px solid var(--op-line); border-radius: 6px; color: #eef5ff; display: block; font-size: 1rem; letter-spacing: .18em; margin: 22px 0 12px; padding: 13px 14px; text-align: center; width: 100%; }
+        .security-card input:focus { border-color: var(--op-blue); outline: none; }
+        .security-actions { display: flex; gap: 10px; justify-content: center; }
         @keyframes op-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
         @media (max-width: 760px) { .op-shell { padding: 24px 18px 50px; } .op-header { align-items: flex-start; flex-direction: column; gap: 18px; } .op-grid, .op-layout { grid-template-columns: 1fr; } }
@@ -55,6 +59,15 @@
             <p>Sign in with the authorized operator account to inspect bot health and send commands.</p>
             <button class="op-button" id="login-button" type="button">Sign in with Discord</button>
             <p id="login-error" class="error-note hidden"></p>
+        </section>
+
+        <section id="security-view" class="op-panel security-card hidden">
+            <div class="op-kicker">Second-step verification</div>
+            <h1>Enter your security key</h1>
+            <p>A security key is emailed to the authorized operator every three days. Enter the latest key to continue.</p>
+            <input id="security-key-input" inputmode="numeric" maxlength="12" autocomplete="one-time-code" placeholder="Security key">
+            <div class="security-actions"><button class="op-button" id="verify-key-button" type="button">Verify key</button><button class="op-button" id="request-key-button" type="button">Send key</button></div>
+            <p id="security-error" class="error-note hidden"></p>
         </section>
 
         <section id="panel-view" class="hidden">
@@ -73,6 +86,8 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             const loginView = document.getElementById('login-view');
             const panelView = document.getElementById('panel-view');
             const loginError = document.getElementById('login-error');
+            const securityView = document.getElementById('security-view');
+            const securityError = document.getElementById('security-error');
             const output = document.getElementById('terminal-output');
             const commandInput = document.getElementById('command-input');
             const commandButton = document.querySelector('#command-form button');
@@ -88,6 +103,7 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                 } catch (error) { return null; }
             }
             function showError(message) { loginError.textContent = message; loginError.classList.remove('hidden'); }
+            function showSecurityError(message) { securityError.textContent = message; securityError.classList.remove('hidden'); }
             function print(message) { output.textContent += `\n${message}`; output.scrollTop = output.scrollHeight; }
             function enterLocalPreview() {
                 document.getElementById('operator-name').textContent = 'Local preview';
@@ -110,6 +126,24 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                 print('Local preview mode enabled. Live commands are disabled.');
             }
             async function discordRequest(path) { const response = await fetch(`https://discord.com/api${path}`, { headers: { Authorization: `Bearer ${token}` } }); if (!response.ok) throw new Error('Discord session expired.'); return response.json(); }
+            async function securityRequest(path, options = {}) {
+                const response = await fetch(`${backendUrl}/api/operator/security/${path}`, { ...options, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true', ...(options.headers || {}) } });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || 'Security service unavailable.');
+                return data;
+            }
+            async function requireSecurityKey() {
+                try {
+                    const status = await securityRequest('status');
+                    if (status.verified === true) return true;
+                    loginView.classList.add('hidden');
+                    securityView.classList.remove('hidden');
+                    return false;
+                } catch (error) {
+                    showError(error.message);
+                    return false;
+                }
+            }
             async function load() {
                 if (isLocalDeveloper) { enterLocalPreview(); return; }
                 const saved = session();
@@ -118,6 +152,7 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                 try {
                     const user = await discordRequest('/users/@me');
                     if (user.username !== operatorName) { showError('This account is not authorized for operator access.'); return; }
+                    if (!(await requireSecurityKey())) return;
                     const guilds = await discordRequest('/users/@me/guilds');
                     document.getElementById('operator-name').textContent = user.global_name || user.username;
                     document.getElementById('operator-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64` : `https://cdn.discordapp.com/embed/avatars/${Number(user.id) % 5}.png`;
@@ -130,6 +165,8 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             function selectGuild(guild, button) { selectedGuild = guild; document.querySelectorAll('.guild-option').forEach((item) => item.classList.remove('selected')); button.classList.add('selected'); document.getElementById('selected-guild-label').textContent = guild.name; commandInput.disabled = false; commandButton.disabled = false; loadStats(); print(`Target selected: ${guild.name}`); }
             async function loadStats() { if (isLocalDeveloper) return; try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/stats`, { headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' } }); if (!response.ok) throw new Error(); const stats = await response.json(); document.getElementById('stat-members').textContent = stats.members ?? '--'; document.getElementById('stat-guilds').textContent = stats.guilds ?? stats.guildCount ?? '--'; document.getElementById('stat-security').textContent = stats.securityStatus ?? stats.security ?? 'Protected'; } catch (error) { document.getElementById('stat-security').textContent = 'Unavailable'; print('Stats endpoint unavailable; showing live operator shell.'); } }
             document.getElementById('login-button').addEventListener('click', () => window.OceanworksAuth.login());
+            document.getElementById('request-key-button').addEventListener('click', async () => { try { await securityRequest('request', { method: 'POST', body: '{}' }); securityError.textContent = 'A new security key was sent.'; securityError.classList.remove('hidden'); } catch (error) { showSecurityError(error.message); } });
+            document.getElementById('verify-key-button').addEventListener('click', async () => { const key = document.getElementById('security-key-input').value.trim(); if (!key) { showSecurityError('Enter the security key from your email.'); return; } try { const result = await securityRequest('verify', { method: 'POST', body: JSON.stringify({ key }) }); if (result.verified === true) window.location.reload(); else showSecurityError('That security key is invalid or expired.'); } catch (error) { showSecurityError(error.message); } });
             document.getElementById('command-form').addEventListener('submit', async (event) => { event.preventDefault(); const command = commandInput.value.trim(); if (!command || !selectedGuild) return; print(`> ${command}`); commandInput.value = ''; if (isLocalDeveloper) { print(`[preview] ${command} queued for ${selectedGuild.name}.`); return; } try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/command`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }, body: JSON.stringify({ command }) }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`); print(data.message || 'Command accepted.'); } catch (error) { print(`Error: ${error.message}`); } });
             load();
         })();

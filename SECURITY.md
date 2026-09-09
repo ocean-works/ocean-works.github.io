@@ -14,3 +14,13 @@ The static site can redirect casual visits to `/api/`, mark routes as `noindex`,
 - Return generic errors to clients and keep detailed diagnostics in server logs.
 
 The `/api/access-attempt` endpoint should accept only a small JSON payload, apply rate limits, avoid storing raw tokens, and return `204 No Content`.
+
+## Operator security key
+
+The operator panel expects the backend to provide these authenticated routes:
+
+- `GET /api/operator/security/status` returns `{ "verified": true|false }`.
+- `POST /api/operator/security/request` generates a cryptographically random, single-use key, emails it to the authorized operator, and enforces a three-day rotation window.
+- `POST /api/operator/security/verify` accepts `{ "key": "..." }`, verifies it server-side, expires it after use or timeout, and returns `{ "verified": true }`.
+
+The backend must bind the key to the authenticated Discord user, never expose it in a response, rate-limit requests and attempts, and reject operator commands until verification succeeds. The browser preview bypasses this only on local development hosts with `?dev=1`.
