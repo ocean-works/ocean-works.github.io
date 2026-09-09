@@ -72,7 +72,6 @@ header {
 .section, .main-content { position: relative; }
 footer { border-color: var(--ow-line) !important; }
 
-/* Keep every public page on the same shell as the root page. */
 body:has(.app-layout) { display: block !important; min-height: 100vh; }
 .app-layout { display: block !important; margin-top: 0 !important; }
 .top-bar { display: none !important; }

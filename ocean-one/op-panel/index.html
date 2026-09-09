@@ -80,8 +80,8 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
     <script src="../../assets/auth.js"></script>
     <script>
         (() => {
-            const operatorName = 'kermit.txt';
-            const backendUrl = '/api/ocean-one/hidden';
+            const operatorId = '1394655096268394592';
+            const backendUrl = 'https://legibly-getaway-demote.ngrok-free.dev';
             const sessionKey = 'oceanworks_discord_session';
             const loginView = document.getElementById('login-view');
             const panelView = document.getElementById('panel-view');
@@ -93,6 +93,8 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             const commandButton = document.querySelector('#command-form button');
             let token = null;
             let selectedGuild = null;
+            let consoleCursor = 0;
+            let consoleTimer = null;
 
             function session() {
                 try {
@@ -128,12 +130,14 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                 token = saved.token;
                 try {
                     const user = await discordRequest('/users/@me');
-                    if (user.username !== operatorName) { showError('This account is not authorized for operator access.'); return; }
+                    if (user.id !== operatorId) { showError('This account is not authorized for operator access.'); return; }
                     if (!(await requireSecurityKey())) return;
                     const guilds = await discordRequest('/users/@me/guilds');
                     document.getElementById('operator-name').textContent = user.global_name || user.username;
                     document.getElementById('operator-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64` : `https://cdn.discordapp.com/embed/avatars/${Number(user.id) % 5}.png`;
                     loginView.classList.add('hidden'); panelView.classList.remove('hidden');
+                    await loadConsole();
+                    consoleTimer = window.setInterval(loadConsole, 1500);
                     const list = document.getElementById('guild-list'); list.innerHTML = '';
                     guilds.forEach((guild) => { const button = document.createElement('button'); button.className = 'guild-option'; button.type = 'button'; button.textContent = guild.name; button.addEventListener('click', () => selectGuild(guild, button)); list.appendChild(button); });
                     if (!guilds.length) list.innerHTML = '<div class="op-panel-intro">No guilds available.</div>';
@@ -141,6 +145,7 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             }
             function selectGuild(guild, button) { selectedGuild = guild; document.querySelectorAll('.guild-option').forEach((item) => item.classList.remove('selected')); button.classList.add('selected'); document.getElementById('selected-guild-label').textContent = guild.name; commandInput.disabled = false; commandButton.disabled = false; loadStats(); print(`Target selected: ${guild.name}`); }
             async function loadStats() { try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/stats`, { headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' } }); if (!response.ok) throw new Error(); const stats = await response.json(); document.getElementById('stat-members').textContent = stats.members ?? '--'; document.getElementById('stat-guilds').textContent = stats.guilds ?? stats.guildCount ?? '--'; document.getElementById('stat-security').textContent = stats.securityStatus ?? stats.security ?? 'Protected'; } catch (error) { document.getElementById('stat-security').textContent = 'Unavailable'; print('Stats endpoint unavailable; showing live operator shell.'); } }
+            async function loadConsole() { try { const response = await fetch(`${backendUrl}/api/operator/console?since=${consoleCursor}`, { headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' } }); if (!response.ok) return; const data = await response.json(); data.entries.forEach((entry) => { consoleCursor = Math.max(consoleCursor, entry.id); print(`[${entry.level}] ${entry.message}`); }); consoleCursor = Math.max(consoleCursor, data.latest || 0); } catch (error) {} }
             document.getElementById('login-button').addEventListener('click', () => window.OceanworksAuth.login());
             document.getElementById('request-key-button').addEventListener('click', async () => { try { await securityRequest('request', { method: 'POST', body: '{}' }); securityError.textContent = 'A new security key was sent by Discord DM.'; securityError.classList.remove('hidden'); } catch (error) { showSecurityError(error.message); } });
             document.getElementById('verify-key-button').addEventListener('click', async () => { const key = document.getElementById('security-key-input').value.trim(); if (!key) { showSecurityError('Enter the security key from your Discord DM.'); return; } try { const result = await securityRequest('verify', { method: 'POST', body: JSON.stringify({ key }) }); if (result.verified === true) window.location.reload(); else showSecurityError('That security key is invalid or expired.'); } catch (error) { showSecurityError(error.message); } });

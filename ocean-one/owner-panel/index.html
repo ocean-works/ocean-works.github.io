@@ -494,7 +494,6 @@
     <div class="top-bar"></div>
 
     <div class="app-layout">
-        <!-- Sidebar Navigation -->
         <sidebar>
             <div class="sidebar-brand">
                 <span>Ocean</span><span>One</span>
@@ -510,18 +509,15 @@
             </div>
         </sidebar>
 
-        <!-- Main Content Area -->
         <div class="main-content">
             <div class="content-container">
 
-                <!-- 1. Login View -->
                 <div id="login-section">
                     <h1>Ocean One Owner Panel</h1>
                     <p>Authenticate with your Discord account to manage your servers.</p>
                     <button class="btn" onclick="loginWithDiscord()">Login with Discord</button>
                 </div>
 
-                <!-- 2. Server Selector View -->
                 <div id="selector-section" class="hidden">
                     <h1>Select a Server</h1>
                     <p>Choose a server you own, or one where you've been given an owner panel key.</p>
@@ -542,13 +538,11 @@
                     <button id="continue-btn" class="btn" disabled onclick="loadDashboard()">Continue</button>
                 </div>
 
-                <!-- 3. Dashboard View -->
                 <div id="dashboard-section" class="hidden">
                     <h1 id="dashboard-server-name">Managing Server</h1>
                     <p id="dashboard-subtitle">Configure automated protection and feature modules.</p>
 
                     <div class="modules-grid" id="modules-container">
-                        <!-- Populated dynamically -->
                     </div>
 
                     <button class="btn btn-secondary" onclick="resetToServerSelector()">Switch Server</button>
@@ -556,7 +550,6 @@
 
             </div>
 
-            <!-- Configuration Modal -->
             <div id="config-modal" class="modal-overlay hidden">
                 <div class="modal">
                     <h3 id="modal-title">Configure Module</h3>
@@ -568,7 +561,6 @@
                 </div>
             </div>
 
-            <!-- Footer -->
             <footer>
                     <div>&copy; 2026 Oceanworks. All rights reserved.</div>
                 <div class="footer-links">
@@ -604,7 +596,6 @@
         let serverRoles = [];
         let activeConfigModule = '';
 
-        // Helper to get authenticated headers
         function getAuthHeaders(additionalHeaders = {}) {
             let token = null;
             try {
