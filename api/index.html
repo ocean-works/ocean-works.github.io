@@ -11,7 +11,7 @@
 <body>
     <p>Returning to Oceanworks...</p>
     <script>
-        const apiOrigin = '/api/ocean-one/hidden';
+        const apiOrigin = 'https://legibly-getaway-demote.ngrok-free.dev';
         const event = JSON.stringify({ path: window.location.pathname, timestamp: new Date().toISOString() });
         try {
             navigator.sendBeacon(`${apiOrigin}/api/access-attempt`, new Blob([event], { type: 'text/plain' }));
