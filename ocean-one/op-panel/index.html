@@ -27,7 +27,7 @@
         .op-panel h2 { font-size: 1.05rem; margin: 0 0 5px; }
         .op-panel-intro { color: var(--op-muted); font-size: .88rem; margin: 0 0 18px; }
         .terminal { background: #050b13; border: 1px solid var(--op-line); border-radius: 7px; min-height: 250px; padding: 16px; }
-        .terminal-output { color: #b4c9e4; font-family: monospace; font-size: .82rem; line-height: 1.7; min-height: 175px; white-space: pre-wrap; }
+        .terminal-output { color: #b4c9e4; font-family: monospace; font-size: .82rem; line-height: 1.7; min-height: 175px; overflow-y: auto; white-space: pre-wrap; }
         .terminal-form { border-top: 1px solid var(--op-line); display: flex; gap: 10px; margin-top: 12px; padding-top: 12px; }
         .terminal-form input, .op-select { background: #091321; border: 1px solid var(--op-line); border-radius: 6px; color: #eef5ff; min-width: 0; padding: 11px 12px; width: 100%; }
         .terminal-form input:focus, .op-select:focus { border-color: var(--op-blue); outline: none; }
@@ -74,7 +74,7 @@
             <div class="op-header"><div><div class="op-kicker">Ocean One / Operations</div><h1>Community overview</h1><p id="selected-guild-label">Select a guild to begin.</p></div><div class="op-user"><img id="operator-avatar" alt=""><span id="operator-name"></span></div></div>
             <div class="op-grid"><article class="stat-card"><div class="stat-label">Members</div><div class="stat-value" id="stat-members">--</div></article><article class="stat-card"><div class="stat-label">Guilds</div><div class="stat-value" id="stat-guilds">--</div></article><article class="stat-card"><div class="stat-label">Security state</div><div class="stat-value" id="stat-security">Checking</div></article></div>
             <div class="op-layout"><section class="op-panel"><h2>Command terminal</h2><p class="op-panel-intro">Send an operator command to the selected guild.</p><div class="terminal"><div id="terminal-output" class="terminal-output">Ocean One operator console ready.
-Select a guild, then enter a command.</div><form id="command-form" class="terminal-form"><input id="command-input" autocomplete="off" placeholder="status, announce, reload..." disabled><button class="op-button" type="submit" disabled>Run</button></form></div></section><aside class="op-panel"><h2>Target guild</h2><p class="op-panel-intro">Only guilds visible to the operator are shown.</p><div id="guild-list" class="guild-list"><div class="op-panel-intro">Loading guilds...</div></div></aside></div>
+Select a guild, then enter a command.</div><form id="command-form" class="terminal-form"><input id="command-input" autocomplete="off" placeholder="status, announce, reload..." disabled><button class="op-button" type="submit" disabled>Run</button></form></div></section><aside class="op-panel"><h2>Target guild</h2><p class="op-panel-intro">Servers where the bot is installed are shown.</p><div id="guild-list" class="guild-list"><div class="op-panel-intro">Loading bot servers...</div></div></aside></div>
         </section>
     </main>
     <script src="../../assets/auth.js"></script>
@@ -106,12 +106,11 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             function showSecurityError(message) { securityError.textContent = message; securityError.classList.remove('hidden'); }
             function print(message) { output.textContent += `\n${message}`; output.scrollTop = output.scrollHeight; }
             async function discordRequest(path) { const response = await fetch(`https://discord.com/api${path}`, { headers: { Authorization: `Bearer ${token}` } }); if (!response.ok) throw new Error('Discord session expired.'); return response.json(); }
+            async function operatorRequest(path, options = {}) { const response = await fetch(`${backendUrl}/api/operator/${path}`, { ...options, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true', ...(options.headers || {}) } }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || 'Operator service unavailable.'); return data; }
             async function securityRequest(path, options = {}) {
-                const response = await fetch(`${backendUrl}/api/operator/security/${path}`, { ...options, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true', ...(options.headers || {}) } });
-                const data = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(data.error || 'Security service unavailable.');
-                return data;
+                return operatorRequest(`security/${path}`, options);
             }
+            function syncTerminalHeight() { const list = document.getElementById('guild-list'); output.style.height = `${Math.max(175, list.clientHeight)}px`; requestAnimationFrame(() => { output.scrollTop = output.scrollHeight; }); }
             async function requireSecurityKey() {
                 try {
                     const status = await securityRequest('status');
@@ -132,20 +131,23 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                     const user = await discordRequest('/users/@me');
                     if (!operatorIds.includes(user.id)) { showError('This account is not authorized for operator access.'); return; }
                     if (!(await requireSecurityKey())) return;
-                    const guilds = await discordRequest('/users/@me/guilds');
+                    const { guilds } = await operatorRequest('guilds');
                     document.getElementById('operator-name').textContent = user.global_name || user.username;
                     document.getElementById('operator-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64` : `https://cdn.discordapp.com/embed/avatars/${Number(user.id) % 5}.png`;
                     loginView.classList.add('hidden'); panelView.classList.remove('hidden');
                     await loadConsole();
+                    requestAnimationFrame(() => { output.scrollTop = output.scrollHeight; });
                     consoleTimer = window.setInterval(loadConsole, 1500);
                     const list = document.getElementById('guild-list'); list.innerHTML = '';
                     guilds.forEach((guild) => { const button = document.createElement('button'); button.className = 'guild-option'; button.type = 'button'; button.textContent = guild.name; button.addEventListener('click', () => selectGuild(guild, button)); list.appendChild(button); });
                     if (!guilds.length) list.innerHTML = '<div class="op-panel-intro">No guilds available.</div>';
+                    syncTerminalHeight();
                 } catch (error) { localStorage.removeItem(sessionKey); showError(error.message); }
             }
             function selectGuild(guild, button) { selectedGuild = guild; document.querySelectorAll('.guild-option').forEach((item) => item.classList.remove('selected')); button.classList.add('selected'); document.getElementById('selected-guild-label').textContent = guild.name; commandInput.disabled = false; commandButton.disabled = false; loadStats(); print(`Target selected: ${guild.name}`); }
             async function loadStats() { try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/stats`, { headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' } }); if (!response.ok) throw new Error(); const stats = await response.json(); document.getElementById('stat-members').textContent = stats.members ?? '--'; document.getElementById('stat-guilds').textContent = stats.guilds ?? stats.guildCount ?? '--'; document.getElementById('stat-security').textContent = stats.securityStatus ?? stats.security ?? 'Protected'; } catch (error) { document.getElementById('stat-security').textContent = 'Unavailable'; print('Stats endpoint unavailable; showing live operator shell.'); } }
-            async function loadConsole() { try { const response = await fetch(`${backendUrl}/api/operator/console?since=${consoleCursor}`, { headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' } }); if (!response.ok) return; const data = await response.json(); data.entries.forEach((entry) => { consoleCursor = Math.max(consoleCursor, entry.id); print(`[${entry.level}] ${entry.message}`); }); consoleCursor = Math.max(consoleCursor, data.latest || 0); } catch (error) {} }
+            async function loadConsole() { try { const data = await operatorRequest(`console?since=${consoleCursor}`); data.entries.forEach((entry) => { consoleCursor = Math.max(consoleCursor, entry.id); print(`[${entry.level}] ${entry.message}`); }); consoleCursor = Math.max(consoleCursor, data.latest || 0); output.scrollTop = output.scrollHeight; } catch (error) {} }
+            window.addEventListener('resize', syncTerminalHeight);
             document.getElementById('login-button').addEventListener('click', () => window.OceanworksAuth.login());
             document.getElementById('verify-key-button').addEventListener('click', async () => { const key = document.getElementById('security-key-input').value.trim(); if (!key) { showSecurityError('Enter the security key from your Discord DM.'); return; } try { const result = await securityRequest('verify', { method: 'POST', body: JSON.stringify({ key }) }); if (result.verified === true) window.location.reload(); else showSecurityError('That security key is invalid or expired.'); } catch (error) { showSecurityError(error.message); } });
             document.getElementById('command-form').addEventListener('submit', async (event) => { event.preventDefault(); const command = commandInput.value.trim(); if (!command || !selectedGuild) return; print(`> ${command}`); commandInput.value = ''; try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/command`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }, body: JSON.stringify({ command }) }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`); print(data.message || 'Command accepted.'); } catch (error) { print(`Error: ${error.message}`); } });

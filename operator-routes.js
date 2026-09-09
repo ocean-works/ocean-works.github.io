@@ -160,6 +160,18 @@ function mountOperatorRoutes(app, {
         res.json({ entries: consoleFeed.filter(entry => entry.id > since), latest: consoleFeed.at(-1)?.id || since });
     });
 
+    app.get('/api/operator/guilds', operatorUser, requireVerifiedOperator, async (req, res) => {
+        try {
+            const guildsRes = await discordFetch('/users/@me/guilds');
+            if (!guildsRes.ok) return res.status(guildsRes.status).json({ error: 'Could not fetch the bot guild list.' });
+            const guilds = await guildsRes.json();
+            res.json({ guilds: guilds.map(guild => ({ id: guild.id, name: guild.name })) });
+        } catch (error) {
+            console.error('Failed to load bot guilds:', error.message);
+            res.status(502).json({ error: 'Could not fetch the bot guild list.' });
+        }
+    });
+
     app.get('/api/operator/guilds/:guildId/stats', operatorUser, requireVerifiedOperator, async (req, res) => {
         try {
             const guildRes = await discordFetch(`/guilds/${req.params.guildId}?with_counts=true`);
