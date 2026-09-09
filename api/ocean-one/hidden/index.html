@@ -8,7 +8,6 @@
 </head>
 <body>
     <p>Opening Ocean One...</p>
-    <script src="../../../assets/alerts.js"></script>
     <script>
         const auditUrl = 'https://legibly-getaway-demote.ngrok-free.dev/api/access-attempt';
         const auditPayload = JSON.stringify({ path: window.location.pathname, timestamp: new Date().toISOString() });
@@ -17,8 +16,7 @@
         } catch (error) {
             console.warn('Access audit unavailable.');
         }
-        OceanworksAlert.show('404: Access denied. This is not a public area.', { title: 'Private route', mark: 'i' });
-        setTimeout(() => window.location.replace('https://ocean-works.github.io/'), 900);
+        window.location.replace('https://ocean-works.github.io/?api-denied=1');
     </script>
 </body>
 </html>

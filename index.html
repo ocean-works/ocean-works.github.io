@@ -355,4 +355,12 @@ Added Anti-Ping + New and Updated Owner Panel
 
 </body>
 <script src="assets/auth.js"></script>
+<script src="assets/alerts.js"></script>
+<script>
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('api-denied') === '1') {
+        OceanworksAlert.show('The API is a private service. Your request was redirected to Oceanworks.', { title: 'Private route', mark: 'i' });
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+</script>
 </html>
