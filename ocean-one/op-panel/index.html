@@ -130,10 +130,10 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                 try {
                     const user = await discordRequest('/users/@me');
                     if (!operatorIds.includes(user.id)) { showError('This account is not authorized for operator access.'); return; }
-                    if (!(await requireSecurityKey())) return;
-                    const { guilds } = await operatorRequest('guilds');
                     document.getElementById('operator-name').textContent = user.global_name || user.username;
                     document.getElementById('operator-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64` : `https://cdn.discordapp.com/embed/avatars/${Number(user.id) % 5}.png`;
+                    if (!(await requireSecurityKey())) return;
+                    const { guilds } = await operatorRequest('guilds');
                     loginView.classList.add('hidden'); panelView.classList.remove('hidden');
                     await loadConsole();
                     requestAnimationFrame(() => { output.scrollTop = output.scrollHeight; });
