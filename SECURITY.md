@@ -23,4 +23,6 @@ The operator panel expects the backend to provide these authenticated routes:
 - `POST /api/operator/security/request` generates a cryptographically random, single-use key, sends it by Discord DM to the authorized operator, and enforces a three-day rotation window.
 - `POST /api/operator/security/verify` accepts `{ "key": "..." }`, verifies it server-side, expires it after use or timeout, and returns `{ "verified": true }`.
 
-The backend must bind the key to the authenticated Discord user, send the DM through Discord, never expose the key in a response, rate-limit requests and attempts, and reject operator commands until verification succeeds. The browser preview bypasses this only on local development hosts with `?dev=1`.
+The generated key format is `oceanworks-{recipient}-{random10}-{huliIssueTime}`. `{random10}` must contain exactly ten cryptographically secure alphanumeric characters. `{huliIssueTime}` is the issued timestamp encoded in HULI, a base-15 system using digits `0-9` and letters `A-E`; it is metadata, not a secret or an integrity check.
+
+The backend must bind the key to the authenticated Discord user ID, send the DM through Discord, store only a hash or keyed MAC of the complete key, never expose the key in an API response, rate-limit requests and attempts, and reject operator commands until verification succeeds. If the key format is displayed or parsed, the backend must validate the recipient and HULI segment against server-generated values. The browser preview bypasses this only on local development hosts with `?dev=1`.
