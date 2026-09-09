@@ -72,7 +72,8 @@
             const output = document.getElementById('terminal-output');
             const commandInput = document.getElementById('command-input');
             const commandButton = document.querySelector('#command-form button');
-            const isLocalDeveloper = ['localhost', '127.0.0.1'].includes(window.location.hostname) && new URLSearchParams(window.location.search).get('dev') === '1';
+            const isDevHost = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.hostname.endsWith('.app.github.dev');
+            const isLocalDeveloper = isDevHost && new URLSearchParams(window.location.search).get('dev') === '1';
             let token = null;
             let selectedGuild = null;
 
