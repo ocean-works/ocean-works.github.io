@@ -579,6 +579,7 @@
         </div>
     </div>
 
+    <script src="../../assets/alerts.js"></script>
     <script>
         const CLIENT_ID = '1530208568392028302';
         const BACKEND_URL = 'https://ocean-works.github.io/api/ocean-one/hidden';
@@ -697,7 +698,7 @@
                 ];
 
                 if (accessibleGuilds.length === 0) {
-                    alert("You don't own any servers, and you haven't been given an owner panel key for any server.");
+                    OceanworksAlert.show("You don't own any servers, and you haven't been given an owner panel key for any server.", { title: 'No eligible servers' });
                     logoutSession();
                     return;
                 }
@@ -813,7 +814,7 @@
                 serverRoles = [];
                 isCurrentServerPlus = false;
 
-                alert(
+                OceanworksAlert.show(
                     "Ocean One couldn't connect right now.\n\n" +
                     "Please try again in a moment. If this keeps happening, let the server owner know."
                 );
@@ -1097,14 +1098,14 @@
                     });
                     const data = await res.json().catch(() => ({}));
                     if (res.ok) {
-                        alert('Anti-ping settings saved!');
+                        OceanworksAlert.show('Anti-ping settings saved!', { title: 'Settings saved', mark: '✓' });
                         closeConfigModal();
                     } else {
-                        alert(data.error || 'Failed to save anti-ping settings.');
+                        OceanworksAlert.show(data.error || 'Failed to save anti-ping settings.', { title: 'Could not save' });
                     }
                 } catch (err) {
                     console.error(err);
-                    alert('Error connecting to backend server.');
+                    OceanworksAlert.show('Error connecting to backend server.', { title: 'Connection error' });
                 }
                 return;
             }
@@ -1128,7 +1129,7 @@
                     body: JSON.stringify({ keys })
                 });
                 if (res.ok) {
-                    alert('Owner panel keys saved!');
+                    OceanworksAlert.show('Owner panel keys saved!', { title: 'Keys saved', mark: '✓' });
                     closeConfigModal();
                 }
                 return;
@@ -1147,14 +1148,14 @@
                 const data = await res.json().catch(() => ({}));
 
                 if (res.ok) {
-                    alert(data.message || `Configuration for ${activeConfigModule} successfully saved!`);
+                    OceanworksAlert.show(data.message || `Configuration for ${activeConfigModule} successfully saved!`, { title: 'Configuration saved', mark: '✓' });
                     closeConfigModal();
                 } else {
-                    alert(data.error || 'Failed to save configuration.');
+                    OceanworksAlert.show(data.error || 'Failed to save configuration.', { title: 'Could not save' });
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error connecting to backend server.');
+                OceanworksAlert.show('Error connecting to backend server.', { title: 'Connection error' });
             }
         }
     </script>

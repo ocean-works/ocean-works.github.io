@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
     <title>Oceanworks API</title>
+    <script src="../assets/alerts.js"></script>
 </head>
 <body>
     <p>Returning to Oceanworks...</p>
@@ -17,8 +18,8 @@
         } catch (error) {
             console.warn('Access audit unavailable.');
         }
-        alert('The API is not a public website. Returning you to Oceanworks.');
-        window.location.replace('https://ocean-works.github.io/');
+        OceanworksAlert.show('The API is not a public website. Returning you to Oceanworks.', { title: 'Private route', mark: 'i' });
+        setTimeout(() => window.location.replace('https://ocean-works.github.io/'), 900);
     </script>
 </body>
 </html>

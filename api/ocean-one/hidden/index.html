@@ -5,6 +5,8 @@
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="refresh" content="0; url=https://ocean-works.github.io/">
     <title>Ocean One</title>
+    <link rel="stylesheet" href="../../../assets/site.css">
+    <script src="../../../assets/alerts.js"></script>
     <script>
         const auditUrl = 'https://ocean-works.github.io/api/ocean-one/hidden/api/access-attempt';
         const auditPayload = JSON.stringify({ path: window.location.pathname, timestamp: new Date().toISOString() });
@@ -13,8 +15,8 @@
         } catch (error) {
             console.warn('Access audit unavailable.');
         }
-        alert('404: Acencess');
-        window.location.replace('https://ocean-works.github.io/');
+        OceanworksAlert.show('404: Access denied. This is not a public area.', { title: 'Private route', mark: 'i' });
+        setTimeout(() => window.location.replace('https://ocean-works.github.io/'), 900);
     </script>
 </head>
 <body>
