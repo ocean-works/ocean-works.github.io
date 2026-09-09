@@ -20,7 +20,7 @@ The `/api/access-attempt` endpoint should accept only a small JSON payload, appl
 The operator panel expects the backend to provide these authenticated routes:
 
 - `GET /api/operator/security/status` returns `{ "verified": true|false }`.
-- `POST /api/operator/security/request` generates a cryptographically random, single-use key, emails it to the authorized operator, and enforces a three-day rotation window.
+- `POST /api/operator/security/request` generates a cryptographically random, single-use key, sends it by Discord DM to the authorized operator, and enforces a three-day rotation window.
 - `POST /api/operator/security/verify` accepts `{ "key": "..." }`, verifies it server-side, expires it after use or timeout, and returns `{ "verified": true }`.
 
-The backend must bind the key to the authenticated Discord user, never expose it in a response, rate-limit requests and attempts, and reject operator commands until verification succeeds. The browser preview bypasses this only on local development hosts with `?dev=1`.
+The backend must bind the key to the authenticated Discord user, send the DM through Discord, never expose the key in a response, rate-limit requests and attempts, and reject operator commands until verification succeeds. The browser preview bypasses this only on local development hosts with `?dev=1`.
