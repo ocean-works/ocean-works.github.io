@@ -10,7 +10,7 @@
         :root { --op-bg: #060b13; --op-panel: #0c1624; --op-line: #1b3048; --op-muted: #7e95ad; --op-blue: #8db7ff; }
         body { background: radial-gradient(circle at 70% -10%, rgba(60, 105, 174, .2), transparent 34rem), var(--op-bg) !important; }
         .op-shell { margin: 0 auto; max-width: 1180px; padding: 44px 24px 72px; }
-        .op-header { align-items: flex-end; display: flex; justify-content: space-between; margin: 34px 0 28px; }
+        .op-header { align-items: flex-end; animation: op-rise .45s ease both; display: flex; justify-content: space-between; margin: 34px 0 28px; }
         .op-kicker { color: var(--op-blue); font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
         .op-header h1 { font-size: clamp(2rem, 4vw, 3.3rem); margin: 8px 0 0; }
         .op-header p { color: var(--op-muted); margin: 8px 0 0; }
@@ -18,11 +18,12 @@
         .op-user img { border: 2px solid var(--op-blue); border-radius: 50%; height: 36px; width: 36px; }
         .op-grid { display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); margin-bottom: 14px; }
         .stat-card, .op-panel { background: linear-gradient(145deg, rgba(16, 31, 49, .96), rgba(8, 17, 29, .96)); border: 1px solid var(--op-line); border-radius: 10px; }
-        .stat-card { min-height: 108px; padding: 20px; }
+        .stat-card { min-height: 108px; padding: 20px; transition: border-color .2s ease, transform .2s ease, background .2s ease; }
+        .stat-card:hover { background: linear-gradient(145deg, rgba(20, 42, 67, .98), rgba(8, 17, 29, .98)); border-color: rgba(141, 183, 255, .55); transform: translateY(-3px); }
         .stat-label { color: var(--op-muted); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
         .stat-value { color: #eef5ff; font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; margin-top: 10px; }
         .op-layout { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .85fr); }
-        .op-panel { padding: 22px; }
+        .op-panel { animation: op-rise .5s ease both; padding: 22px; }
         .op-panel h2 { font-size: 1.05rem; margin: 0 0 5px; }
         .op-panel-intro { color: var(--op-muted); font-size: .88rem; margin: 0 0 18px; }
         .terminal { background: #050b13; border: 1px solid var(--op-line); border-radius: 7px; min-height: 250px; padding: 16px; }
@@ -33,13 +34,15 @@
         .op-button { background: var(--op-blue); border: 0; border-radius: 6px; color: #07101c; cursor: pointer; font-weight: 700; padding: 10px 16px; }
         .op-button:disabled { cursor: not-allowed; opacity: .5; }
         .guild-list { display: grid; gap: 8px; max-height: 230px; overflow: auto; }
-        .guild-option { background: #091321; border: 1px solid var(--op-line); border-radius: 6px; color: #c9daed; cursor: pointer; padding: 12px; text-align: left; }
-        .guild-option:hover, .guild-option.selected { border-color: var(--op-blue); color: white; }
+        .guild-option { background: #091321; border: 1px solid var(--op-line); border-radius: 6px; color: #c9daed; cursor: pointer; padding: 12px; text-align: left; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+        .guild-option:hover, .guild-option.selected { background: #10243a; border-color: var(--op-blue); color: white; transform: translateX(3px); }
         .access-denied { color: #ff9c9c; }
         .hidden { display: none !important; }
         .login-card { margin: 90px auto; max-width: 560px; text-align: center; }
         .login-card p { color: var(--op-muted); }
         .error-note { color: #ff9c9c; font-size: .9rem; margin-top: 16px; }
+        @keyframes op-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
         @media (max-width: 760px) { .op-shell { padding: 24px 18px 50px; } .op-header { align-items: flex-start; flex-direction: column; gap: 18px; } .op-grid, .op-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -56,8 +59,9 @@
 
         <section id="panel-view" class="hidden">
             <div class="op-header"><div><div class="op-kicker">Ocean One / Operations</div><h1>Community overview</h1><p id="selected-guild-label">Select a guild to begin.</p></div><div class="op-user"><img id="operator-avatar" alt=""><span id="operator-name"></span></div></div>
-            <div class="op-grid"><article class="stat-card"><div class="stat-label">Members</div><div class="stat-value" id="stat-members">--</div></article><article class="stat-card"><div class="stat-label">Actions</div><div class="stat-value" id="stat-actions">--</div></article><article class="stat-card"><div class="stat-label">Security</div><div class="stat-value" id="stat-security">Waiting</div></article></div>
-            <div class="op-layout"><section class="op-panel"><h2>Command terminal</h2><p class="op-panel-intro">Send an operator command to the selected guild.</p><div class="terminal"><div id="terminal-output" class="terminal-output">Ocean One operator console ready.\nSelect a guild, then enter a command.</div><form id="command-form" class="terminal-form"><input id="command-input" autocomplete="off" placeholder="status, announce, reload..." disabled><button class="op-button" type="submit" disabled>Run</button></form></div></section><aside class="op-panel"><h2>Target guild</h2><p class="op-panel-intro">Only guilds visible to the operator are shown.</p><div id="guild-list" class="guild-list"><div class="op-panel-intro">Loading guilds...</div></div></aside></div>
+            <div class="op-grid"><article class="stat-card"><div class="stat-label">Members</div><div class="stat-value" id="stat-members">--</div></article><article class="stat-card"><div class="stat-label">Guilds</div><div class="stat-value" id="stat-guilds">--</div></article><article class="stat-card"><div class="stat-label">Security</div><div class="stat-value" id="stat-security">Waiting</div></article></div>
+            <div class="op-layout"><section class="op-panel"><h2>Command terminal</h2><p class="op-panel-intro">Send an operator command to the selected guild.</p><div class="terminal"><div id="terminal-output" class="terminal-output">Ocean One operator console ready.
+Select a guild, then enter a command.</div><form id="command-form" class="terminal-form"><input id="command-input" autocomplete="off" placeholder="status, announce, reload..." disabled><button class="op-button" type="submit" disabled>Run</button></form></div></section><aside class="op-panel"><h2>Target guild</h2><p class="op-panel-intro">Only guilds visible to the operator are shown.</p><div id="guild-list" class="guild-list"><div class="op-panel-intro">Loading guilds...</div></div></aside></div>
         </section>
     </main>
     <script src="../../assets/auth.js"></script>
@@ -101,7 +105,7 @@
                     list.appendChild(button);
                 });
                 document.getElementById('stat-members').textContent = '8,492';
-                document.getElementById('stat-actions').textContent = '1,204';
+                document.getElementById('stat-guilds').textContent = '2';
                 document.getElementById('stat-security').textContent = 'Healthy';
                 print('Local preview mode enabled. Live commands are disabled.');
             }
@@ -124,9 +128,9 @@
                 } catch (error) { localStorage.removeItem(sessionKey); showError(error.message); }
             }
             function selectGuild(guild, button) { selectedGuild = guild; document.querySelectorAll('.guild-option').forEach((item) => item.classList.remove('selected')); button.classList.add('selected'); document.getElementById('selected-guild-label').textContent = guild.name; commandInput.disabled = false; commandButton.disabled = false; loadStats(); print(`Target selected: ${guild.name}`); }
-            async function loadStats() { try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/stats`, { headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' } }); if (!response.ok) throw new Error(); const stats = await response.json(); document.getElementById('stat-members').textContent = stats.members ?? '--'; document.getElementById('stat-actions').textContent = stats.actions ?? '--'; document.getElementById('stat-security').textContent = stats.security ?? 'Healthy'; } catch (error) { print('Stats endpoint unavailable; showing live operator shell.'); } }
+            async function loadStats() { if (isLocalDeveloper) return; try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/stats`, { headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' } }); if (!response.ok) throw new Error(); const stats = await response.json(); document.getElementById('stat-members').textContent = stats.members ?? '--'; document.getElementById('stat-guilds').textContent = stats.guilds ?? stats.guildCount ?? '--'; document.getElementById('stat-security').textContent = stats.security ?? 'Healthy'; } catch (error) { print('Stats endpoint unavailable; showing live operator shell.'); } }
             document.getElementById('login-button').addEventListener('click', () => window.OceanworksAuth.login());
-            document.getElementById('command-form').addEventListener('submit', async (event) => { event.preventDefault(); const command = commandInput.value.trim(); if (!command || !selectedGuild) return; print(`> ${command}`); commandInput.value = ''; try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/command`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }, body: JSON.stringify({ command }) }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`); print(data.message || 'Command accepted.'); } catch (error) { print(`Error: ${error.message}`); } });
+            document.getElementById('command-form').addEventListener('submit', async (event) => { event.preventDefault(); const command = commandInput.value.trim(); if (!command || !selectedGuild) return; print(`> ${command}`); commandInput.value = ''; if (isLocalDeveloper) { print(`[preview] ${command} queued for ${selectedGuild.name}.`); return; } try { const response = await fetch(`${backendUrl}/api/operator/guilds/${encodeURIComponent(selectedGuild.id)}/command`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }, body: JSON.stringify({ command }) }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`); print(data.message || 'Command accepted.'); } catch (error) { print(`Error: ${error.message}`); } });
             load();
         })();
     </script>
