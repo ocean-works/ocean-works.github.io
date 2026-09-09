@@ -22,7 +22,7 @@
         dialog.innerHTML = `<div class="ow-alert-mark">${options.mark || '!'}</div><h2>${options.title || 'Oceanworks'}</h2><p></p><button type="button">${options.action || 'Okay'}</button>`;
         dialog.querySelector('p').textContent = String(message);
         backdrop.appendChild(dialog);
-        document.body.appendChild(backdrop);
+        (document.body || document.documentElement).appendChild(backdrop);
         const close = () => backdrop.remove();
         dialog.querySelector('button').addEventListener('click', close);
         backdrop.addEventListener('click', event => { if (event.target === backdrop) close(); });
