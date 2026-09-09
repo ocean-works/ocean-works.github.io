@@ -14,8 +14,10 @@
         } catch (error) {
             console.warn('Access audit unavailable.');
         }
-        OceanworksAlert.show('404: Access denied. This is not a public area.', { title: 'Private route', mark: 'i' });
-        setTimeout(() => window.location.replace('https://ocean-works.github.io/'), 900);
+        window.addEventListener('DOMContentLoaded', () => {
+            OceanworksAlert.show('404: Access denied. This is not a public area.', { title: 'Private route', mark: 'i' });
+            setTimeout(() => window.location.replace('https://ocean-works.github.io/'), 900);
+        });
     </script>
 </head>
 <body>
