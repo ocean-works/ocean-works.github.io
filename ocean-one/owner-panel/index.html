@@ -562,7 +562,7 @@
             </div>
 
             <footer>
-                    <div>&copy; 2026 Oceanworks. All rights reserved.</div>
+                <div>&copy; 2026 Oceanworks. All rights reserved.</div>
                 <div class="footer-links">
                     <a href="/privacypolicy">Privacy Policy</a>
                     <a href="/tos">Terms of Service</a>
@@ -1021,7 +1021,7 @@
                 modalBody.innerHTML = `
                     <div class="form-group">
                         <label>Custom Server Nickname</label>
-                        <input type="text" id="cfg-nickname" value="${saved.nickname || 'Ocean One'}">
+                        <input type="text" id="cfg-nickname" value="${saved.nickname || 'Ocean One'}" placeholder="Ocean One">
                     </div>
                     <div class="form-group">
                         <label>Custom Profile Picture URL (Avatar)</label>
@@ -1035,7 +1035,7 @@
                         <label>Custom Bio / About Me</label>
                         <textarea id="cfg-bio" rows="2" placeholder="Custom bot bio for this server...">${saved.bio || ''}</textarea>
                     </div>
-                    <p style="color: var(--text-muted); font-size: 13px;">Avatar and profile assets will be deployed via your backend's webhooks/per-server asset sync engine.</p>
+                    <p style="color: var(--text-muted); font-size: 13px;">Custom nickname changes are synchronized directly to your Discord server in real-time.</p>
                 `;
                 return;
             }
@@ -1104,11 +1104,15 @@
             let configData = {};
 
             if (activeConfigModule === 'customization') {
+                if (!isCurrentServerPlus) {
+                    OceanworksAlert.show('Customization features require an active Ocean+ subscription.', { title: 'Ocean+ Required' });
+                    return;
+                }
                 configData = {
-                    nickname: document.getElementById('cfg-nickname').value,
-                    avatarUrl: document.getElementById('cfg-avatar').value,
-                    bannerUrl: document.getElementById('cfg-banner').value,
-                    bio: document.getElementById('cfg-bio').value
+                    nickname: document.getElementById('cfg-nickname').value.trim() || 'Ocean One',
+                    avatarUrl: document.getElementById('cfg-avatar').value.trim(),
+                    bannerUrl: document.getElementById('cfg-banner').value.trim(),
+                    bio: document.getElementById('cfg-bio').value.trim()
                 };
             } else if (activeConfigModule === 'owner_keys') {
                 const keysRaw = document.getElementById('cfg-owner-keys').value;
