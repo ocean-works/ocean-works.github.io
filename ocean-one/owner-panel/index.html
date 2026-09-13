@@ -1104,10 +1104,6 @@
             let configData = {};
 
             if (activeConfigModule === 'customization') {
-                if (!isCurrentServerPlus) {
-                    OceanworksAlert.show('Customization features require an active Ocean+ subscription.', { title: 'Ocean+ Required' });
-                    return;
-                }
                 configData = {
                     nickname: document.getElementById('cfg-nickname').value.trim() || 'Ocean One',
                     avatarUrl: document.getElementById('cfg-avatar').value.trim(),
