@@ -1,0 +1,14 @@
+{
+  "name": "ocean-utils-bot",
+  "version": "1.0.0",
+  "description": "Discord bot scaffold for Ocean Utils message sending and template dispatch",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5"
+  }
+}

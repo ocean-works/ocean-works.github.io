@@ -1,0 +1,58 @@
+{
+  "templates": [
+    {
+      "id": "demo-template",
+      "name": "Welcome board",
+      "content": {
+        "content": "",
+        "embeds": [
+          {
+            "title": "Ocean Utils",
+            "description": "Design embeds and bot-ready components from one clean local workspace.",
+            "color": 16760480,
+            "image": {
+              "url": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80"
+            },
+            "thumbnail": {
+              "url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&q=80"
+            },
+            "footer": {
+              "text": "Oceanworks • Local builder",
+              "icon_url": "https://i.imgur.com/3NwUQhR.png"
+            },
+            "author": {
+              "name": "Ocean Utils",
+              "icon_url": "https://i.imgur.com/7eQZ3tt.png"
+            }
+          }
+        ],
+        "components": [
+          {
+            "type": 1,
+            "components": [
+              { "type": 2, "style": 1, "label": "Open portal", "custom_id": "open_portal" },
+              { "type": 2, "style": 2, "label": "View docs", "custom_id": "view_docs" }
+            ]
+          },
+          {
+            "type": 1,
+            "components": [
+              {
+                "type": 3,
+                "custom_id": "ops_menu",
+                "placeholder": "Choose a task",
+                "min_values": 1,
+                "max_values": 1,
+                "options": [
+                  { "label": "Announcements", "value": "announcements", "description": "Send an announcement message" },
+                  { "label": "Backups", "value": "backups", "description": "Restore an older template" },
+                  { "label": "Reports", "value": "reports", "description": "Review recent activity" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

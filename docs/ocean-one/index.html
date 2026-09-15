@@ -3,36 +3,170 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Ocean One documentation and service links.">
+    <meta name="description" content="Ocean One setup guide, usage guide, commands, and configuration resources.">
     <title>Ocean One | Docs</title>
     <link rel="stylesheet" href="../../assets/site.css">
     <style>
         body { min-height: 100vh; }
-        .docs-shell { max-width: 980px; margin: 0 auto; padding: 28px 22px 72px; }
-        .docs-nav { align-items: center; display: flex; justify-content: space-between; margin-bottom: 80px; }
-        .docs-nav a { color: var(--ow-muted); text-decoration: none; }
-        .docs-nav .brand { color: var(--ow-copy); font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; }
-        .docs-nav .brand span { color: var(--ow-cyan); }
-        .docs-hero { max-width: 720px; padding-bottom: 48px; }
+        .docs-shell { max-width: 1120px; margin: 0 auto; padding: 28px 22px 72px; }
+        .docs-hero { max-width: 780px; padding-bottom: 36px; }
         .eyebrow { color: var(--ow-coral); font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-        .docs-hero h1 { font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1.02; margin: 12px 0 20px; }
-        .docs-hero p { color: var(--ow-muted); font-size: 1.1rem; max-width: 600px; }
-        .docs-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-        .docs-card { background: rgba(16,43,61,.78); border: 1px solid var(--ow-line); border-radius: 8px; padding: 24px; }
-        .docs-card h2 { font-size: 1.1rem; margin-top: 0; }
-        .docs-card p { color: var(--ow-muted); }
+        .docs-hero h1 { font-size: clamp(2.7rem, 7vw, 4.8rem); line-height: 1.02; margin: 12px 0 20px; }
+        .docs-hero p { color: var(--ow-muted); font-size: 1.08rem; max-width: 700px; }
+        .docs-grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+        .docs-card { background: rgba(16,43,61,.78); border: 1px solid var(--ow-line); border-radius: 12px; padding: 24px; }
+        .docs-card h2 { font-size: 1.08rem; margin-top: 0; }
+        .docs-card p { color: var(--ow-muted); line-height: 1.7; }
         .docs-card a { font-weight: 700; text-decoration: none; }
+        .docs-section { margin-top: 40px; }
+        .docs-section h2 { margin-bottom: 18px; }
+        .steps { display: grid; gap: 16px; }
+        .step { background: rgba(16,43,61,.72); border: 1px solid var(--ow-line); border-radius: 12px; padding: 20px; }
+        .step-number { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,136,0,.14); color: var(--ow-coral); font-weight: 700; margin-bottom: 12px; }
+        .step p, .step li { color: var(--ow-muted); line-height: 1.75; }
+        .step ul { margin: 12px 0 0 18px; }
+        .command-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .command-box { background: rgba(16,43,61,.72); border: 1px solid var(--ow-line); border-radius: 12px; padding: 18px; }
+        .command-box code, .command-box .cmd { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: rgba(7,19,31,.7); border: 1px solid var(--ow-line); border-radius: 8px; color: var(--ow-copy); display: inline-block; font-size: .82rem; padding: 5px 8px; }
+        .command-box p { color: var(--ow-muted); margin-top: 10px; }
+        .resource-list { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .resource-tag { display: inline-block; padding: 8px 12px; border-radius: 999px; background: rgba(85,214,210,.08); border: 1px solid rgba(85,214,210,.18); color: var(--ow-copy); text-decoration: none; font-size: .82rem; }
     </style>
 </head>
 <body>
     <div class="docs-shell">
         <header><div class="container"><nav class="nav"><a class="logo" href="../../">Ocean<span>works</span></a><div class="links"><a href="../../">Home</a><a href="../../beacon/">Beacon</a><a href="https://discord.gg/UdAKT57TK9" target="_blank" rel="noopener noreferrer">Discord</a><a class="auth-link" href="../../ocean-one/owner-panel/">Sign in</a></div></nav></div></header>
         <main>
-            <section class="docs-hero"><div class="eyebrow">Ocean One / Documentation</div><h1>Run a calmer server.</h1><p>Ocean One gives Discord communities the tools to moderate, verify, log activity, and keep their members moving in the same direction.</p></section>
+            <section class="docs-hero">
+                <div class="eyebrow">Ocean One / Documentation</div>
+                <h1>Set up a calmer, safer server.</h1>
+                <p>Ocean One gives Discord communities the tools to moderate, verify, log activity, manage permissions, and keep a cleaner, more organized environment. This page is the setup and usage guide for the public features and the owner-panel configuration flow.</p>
+            </section>
+
             <section class="docs-grid" aria-label="Documentation links">
-                <article class="docs-card"><h2>Server setup</h2><p>Add the bot, review permissions, and start with the defaults that keep your community protected.</p><a href="../../ocean-one/">View Ocean One</a></article>
-                <article class="docs-card"><h2>Owner panel</h2><p>Sign in with Discord to manage available modules and configure your connected servers.</p><a href="../../ocean-one/owner-panel/">Open owner panel</a></article>
-                <article class="docs-card"><h2>Verification</h2><p>Connect Roblox and Discord accounts through the Oceanworks verification flow.</p><a href="../../verification/">Open verification</a></article>
+                <article class="docs-card">
+                    <h2>Product overview</h2>
+                    <p>Review the service and learn what Ocean One is designed to do.</p>
+                    <a href="../../ocean-one/">Open Ocean One</a>
+                </article>
+                <article class="docs-card">
+                    <h2>Owner panel</h2>
+                    <p>Sign in with Discord to access server configuration, moderation tools, keys, and feature toggles.</p>
+                    <a href="../../ocean-one/owner-panel/">Open owner panel</a>
+                </article>
+                <article class="docs-card">
+                    <h2>Verification</h2>
+                    <p>Connect Discord and Roblox accounts through the verification flow.</p>
+                    <a href="../../verification/">Open verification</a>
+                </article>
+                <article class="docs-card">
+                    <h2>Data deletion</h2>
+                    <p>Review or request removal of stored server data and configuration records.</p>
+                    <a href="../../ocean-one/data/deletion/">Open deletion page</a>
+                </article>
+                <article class="docs-card">
+                    <h2>Privacy & terms</h2>
+                    <p>Read the policy and service terms.</p>
+                    <a href="../../privacypolicy/">Privacy policy</a>
+                    <span> · </span>
+                    <a href="../../tos/">Terms</a>
+                </article>
+                <article class="docs-card">
+                    <h2>Support</h2>
+                    <p>Need help with setup, access, or permissions? Join the official Discord support community.</p>
+                    <a href="https://discord.gg/UdAKT57TK9" target="_blank" rel="noopener noreferrer">Join Discord</a>
+                </article>
+            </section>
+
+            <section class="docs-section">
+                <h2>How to set it up</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <p><strong>Add Ocean One to your server.</strong> Use the main product page to begin the invite process and make sure the bot has the permissions it needs for moderation, logs, and verification.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <p><strong>Open the owner panel.</strong> Sign in with your Discord account from the owner panel and select the server you want to manage. The panel is where you configure modules, roles, and automation settings.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <p><strong>Review the feature list.</strong> Start with the basics: moderation, logging, anti-ping, ticketing, verification, and server keys. You can enable or disable them depending on the server's needs.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <p><strong>Set roles and channels.</strong> Choose which channels should receive logs, announcements, verification screens, or ticket panels. Keep the permissions tight so only trusted staff can manage configurations.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <p><strong>Test it before launch.</strong> Run a quick check as a staff member to confirm the bot responds correctly, logs are being recorded, and verification or ticket workflows behave the way you expect.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="docs-section">
+                <h2>How to use it</h2>
+                <div class="steps">
+                    <div class="step">
+                        <p><strong>For server owners:</strong> use the owner panel to configure protection, verification, tickets, logging, and access controls.</p>
+                    </div>
+                    <div class="step">
+                        <p><strong>For moderators:</strong> rely on configured moderation and logging flows to keep the server clean, consistent, and well documented.</p>
+                    </div>
+                    <div class="step">
+                        <p><strong>For members:</strong> use the verification flow if it's enabled, and follow the configured channels and rules your server sets up.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="docs-section">
+                <h2>Common command reference</h2>
+                <div class="command-grid">
+                    <div class="command-box">
+                        <span class="cmd">status</span>
+                        <p>Shows the bot's current status and server health check.</p>
+                    </div>
+                    <div class="command-box">
+                        <span class="cmd">help</span>
+                        <p>Displays the list of available commands and quick usage help.</p>
+                    </div>
+                    <div class="command-box">
+                        <span class="cmd">announce</span>
+                        <p>Broadcasts a message to a configured channel or announcement route.</p>
+                    </div>
+                    <div class="command-box">
+                        <span class="cmd">logs</span>
+                        <p>Pulls or summarizes recent event data from moderation or activity logs.</p>
+                    </div>
+                    <div class="command-box">
+                        <span class="cmd">verify</span>
+                        <p>Starts or checks the verification flow for a user or guild workflow.</p>
+                    </div>
+                    <div class="command-box">
+                        <span class="cmd">ticket</span>
+                        <p>Opens or manages tickets for support, reports, or staff requests.</p>
+                    </div>
+                    <div class="command-box">
+                        <span class="cmd">moderate</span>
+                        <p>Access moderation-specific checks or admin actions depending on configuration.</p>
+                    </div>
+                    <div class="command-box">
+                        <span class="cmd">config</span>
+                        <p>Loads the current settings and configuration for a guild or configured module.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="docs-section">
+                <h2>Related pages</h2>
+                <div class="resource-list">
+                    <a class="resource-tag" href="../../ocean-one/">ocean-one/</a>
+                    <a class="resource-tag" href="../../ocean-one/owner-panel/">owner-panel/</a>
+                    <a class="resource-tag" href="../../verification/">verification/</a>
+                    <a class="resource-tag" href="../../ocean-one/data/deletion/">data/deletion/</a>
+                    <a class="resource-tag" href="../../privacypolicy/">privacypolicy/</a>
+                    <a class="resource-tag" href="../../tos/">tos/</a>
+                </div>
             </section>
         </main>
     </div>

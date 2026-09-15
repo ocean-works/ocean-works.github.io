@@ -6,525 +6,627 @@
 <title>Beacon | Oceanworks</title>
 
 <style>
-:root{
-    --bg-color:#0d1117;
-    --card-bg:#121212;
-    --border-color:#222222;
-    --accent-orange:#ff8800;
-    --text-main:#c9d1d9;
-    --text-muted:#8b949e;
-    --sidebar-width:260px;
+:root {
+    --ow-ink: #07131f;
+    --ow-night: #0b1f2e;
+    --ow-panel: #102b3d;
+    --ow-panel-2: #15384c;
+    --ow-line: rgba(177, 220, 235, .18);
+    --ow-copy: #e8f5f8;
+    --ow-muted: #9fc0ca;
+    --ow-cyan: #55d6d2;
+    --ow-coral: #ff8f70;
+    --ow-orange: #ff8800;
+    --ow-panel-strong: rgba(16, 43, 61, .82);
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    scroll-behavior:smooth;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
-body{
-    font-family:'Segoe UI',sans-serif;
-    background:var(--bg-color);
-    color:var(--text-main);
+body {
+    background: radial-gradient(circle at 80% -10%, rgba(255, 136, 0, .16), transparent 34rem), var(--ow-ink);
+    color: var(--ow-copy);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.65;
 }
 
-.top-bar{
-    width:100%;
-    height:6px;
-    background:var(--accent-orange);
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:1000;
+body::before {
+    background-image: linear-gradient(rgba(177,220,235,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(177,220,235,.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    content: '';
+    inset: 0;
+    pointer-events: none;
+    position: fixed;
+    z-index: -1;
 }
 
-.app-layout{
-    display:flex;
-    margin-top:6px;
+h1, h2, h3, .logo, .section-tag {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -.02em;
 }
 
-sidebar{
-    width:var(--sidebar-width);
-    background:var(--card-bg);
-    border-right:1px solid var(--border-color);
-    position:fixed;
-    height:calc(100vh - 6px);
-    padding:30px 20px;
-    display:flex;
-    flex-direction:column;
+header {
+    background: rgba(11, 31, 46, .96);
+    border-bottom: 1px solid var(--ow-line);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.sidebar-brand{
-    font-size:1.2rem;
-    font-weight:bold;
-    color:white;
-    margin-bottom:40px;
+.container {
+    margin: 0 auto;
+    max-width: 1100px;
+    padding: 0 24px;
 }
 
-.sidebar-brand span{
-    color:var(--accent-orange);
+.nav {
+    align-items: center;
+    display: flex;
+    height: 72px;
+    justify-content: space-between;
 }
 
-.sidebar-menu{
-    list-style:none;
-    display:flex;
-    flex-direction:column;
-    gap:15px;
-    flex:1;
+.logo {
+    color: var(--ow-copy);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-decoration: none;
 }
 
-.sidebar-menu a{
-    color:var(--text-muted);
-    text-decoration:none;
-    padding:10px 15px;
-    border-radius:8px;
-    font-weight:600;
-    display:block;
-    transition:.2s;
+.logo span {
+    color: var(--ow-orange);
 }
 
-.sidebar-menu a:hover,
-.sidebar-menu a.active{
-    color:white;
-    background:rgba(255,136,0,.10);
-    border-left:3px solid var(--accent-orange);
+.links {
+    align-items: center;
+    display: flex;
+    gap: 22px;
 }
 
-.sidebar-footer{
-    font-size:12px;
-    color:var(--text-muted);
-    border-top:1px solid var(--border-color);
-    padding-top:15px;
+.links a {
+    color: var(--ow-muted);
+    font-size: .95rem;
+    text-decoration: none;
 }
 
-.main-content{
-    margin-left:var(--sidebar-width);
-    width:100%;
-    padding:50px;
+.links a:hover {
+    color: var(--ow-copy);
 }
 
-.hero{
-    max-width:1000px;
-    margin:auto;
-    background:var(--card-bg);
-    border:1px solid var(--border-color);
-    border-radius:12px;
-    padding:60px;
-    text-align:center;
+.main-shell {
+    padding: 80px 24px 40px;
 }
 
-.hero h1{
-    color:white;
-    font-size:3rem;
-    margin-bottom:15px;
+.hero {
+    background: rgba(16, 43, 61, .82);
+    border: 1px solid var(--ow-line);
+    border-radius: 20px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.16);
+    margin: 0 auto;
+    max-width: 1100px;
+    overflow: hidden;
+    padding: 80px 64px;
+    position: relative;
 }
 
-.hero p{
-    color:var(--text-muted);
-    line-height:1.8;
-    margin-bottom:30px;
+.hero::after {
+    background: var(--ow-orange);
+    border-radius: 50%;
+    content: '';
+    filter: blur(1px);
+    height: 10px;
+    position: absolute;
+    right: 12%;
+    top: 18%;
+    width: 10px;
 }
 
-.cta-buttons{
-    display:flex;
-    gap:15px;
-    justify-content:center;
-    flex-wrap:wrap;
+.hero-inner {
+    align-items: center;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1.3fr .7fr;
 }
 
-.btn{
-    padding:12px 28px;
-    border-radius:8px;
-    text-decoration:none;
-    font-weight:bold;
-    transition:.2s;
+.section-tag {
+    color: var(--ow-orange);
+    font-size: .78rem;
+    letter-spacing: .08em;
+    margin-bottom: 14px;
+    text-transform: uppercase;
 }
 
-.btn-primary{
-    background:var(--accent-orange);
-    color:white;
+.hero h1 {
+    color: var(--ow-copy);
+    font-size: clamp(2.7rem, 5vw, 4.25rem);
+    line-height: 1.02;
+    margin-bottom: 16px;
 }
 
-.btn-primary:hover{
-    background:#df7700;
+.hero p {
+    color: var(--ow-muted);
+    font-size: 1.08rem;
+    max-width: 620px;
 }
 
-.btn-secondary{
-    background:#1d1d1d;
-    color:white;
-    border:1px solid var(--border-color);
+.cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 28px;
 }
 
-.btn-secondary:hover{
-    background:#2a2a2a;
+.btn {
+    border-radius: 10px;
+    display: inline-block;
+    font-weight: 700;
+    padding: 13px 24px;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
 }
 
-.section{
-    max-width:1000px;
-    margin:35px auto;
+.btn-primary {
+    background: var(--ow-orange);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(255, 136, 0, .22);
 }
 
-.section-title{
-    text-align:center;
-    color:white;
-    font-size:2rem;
-    margin-bottom:10px;
+.btn-primary:hover {
+    background: #e27700;
+    transform: translateY(-2px);
 }
 
-.section-subtitle{
-    text-align:center;
-    color:var(--text-muted);
-    margin-bottom:35px;
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--ow-line);
+    color: var(--ow-copy);
 }
 
-.features-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:20px;
+.btn-secondary:hover {
+    border-color: rgba(255, 136, 0, .5);
+    box-shadow: 0 8px 24px rgba(255, 136, 0, .12);
+    transform: translateY(-2px);
 }
 
-.feature-card{
-    background:var(--card-bg);
-    border:1px solid var(--border-color);
-    border-radius:12px;
-    padding:25px;
-    transition:.2s;
+.hero-panel {
+    background: linear-gradient(180deg, rgba(255, 136, 0, .12), rgba(255, 136, 0, .02));
+    border: 1px solid rgba(255, 136, 0, .25);
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
 }
 
-.feature-card:hover{
-    border-color:var(--accent-orange);
-    transform:translateY(-3px);
+.status-card {
+    background: rgba(10, 20, 30, .58);
+    border: 1px solid var(--ow-line);
+    border-radius: 12px;
+    padding: 18px;
 }
 
-.feature-card h3{
-    color:white;
-    margin-bottom:10px;
+.status-head {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
 }
 
-.feature-card p{
-    color:var(--text-muted);
-    line-height:1.7;
+.status-dot {
+    background: #32d583;
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
 }
 
-.plus-section{
-    background:linear-gradient(
-        135deg,
-        rgba(255,136,0,.18),
-        rgba(255,136,0,.05)
-    );
-    border:1px solid rgba(255,136,0,.25);
-    border-radius:12px;
-    padding:50px;
-    text-align:center;
+.status-card h3 {
+    color: var(--ow-copy);
+    font-size: 1rem;
+    margin-bottom: 8px;
 }
 
-.plus-section h2{
-    color:white;
-    margin-bottom:15px;
+.status-card p {
+    color: var(--ow-muted);
+    font-size: .9rem;
 }
 
-.plus-section p{
-    color:var(--text-main);
-    line-height:1.8;
+.metric-row {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.add-beacon{
-    background:var(--card-bg);
-    border:1px solid var(--border-color);
-    border-radius:12px;
-    padding:60px;
-    text-align:center;
+.metric {
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--ow-line);
+    border-radius: 12px;
+    padding: 16px 14px;
 }
 
-.add-beacon h2{
-    color:white;
-    margin-bottom:15px;
+.metric strong {
+    color: var(--ow-copy);
+    display: block;
+    font-size: 1.35rem;
+    margin-bottom: 6px;
 }
 
-.add-beacon p{
-    color:var(--text-muted);
-    margin-bottom:25px;
-    line-height:1.7;
+.metric span {
+    color: var(--ow-muted);
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
 }
 
-footer{
-    max-width:1000px;
-    margin:50px auto 0;
-    border-top:1px solid var(--border-color);
-    padding-top:20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:15px;
-    color:var(--text-muted);
-    font-size:13px;
+.section {
+    margin: 36px auto 0;
+    max-width: 1100px;
 }
 
-.footer-links{
-    display:flex;
-    gap:20px;
+.section-header {
+    margin-bottom: 26px;
+    text-align: center;
 }
 
-.footer-links a{
-    color:var(--text-muted);
-    text-decoration:none;
+.section-header h2 {
+    color: var(--ow-copy);
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    margin-bottom: 10px;
 }
 
-.footer-links a:hover{
-    color:var(--accent-orange);
+.section-header p {
+    color: var(--ow-muted);
+    margin: 0 auto;
+    max-width: 700px;
 }
 
-@media(max-width:768px){
+.features-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
 
-    sidebar{
-        display:none;
+.feature-card {
+    background: rgba(16, 43, 61, .82);
+    border: 1px solid var(--ow-line);
+    border-radius: 16px;
+    padding: 26px 22px;
+    transition: transform .2s ease, border-color .2s ease;
+}
+
+.feature-card:hover {
+    border-color: rgba(255, 136, 0, .5);
+    transform: translateY(-3px);
+}
+
+.feature-card h3 {
+    color: var(--ow-copy);
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: var(--ow-muted);
+    line-height: 1.7;
+}
+
+.plus-section {
+    background: linear-gradient(135deg, rgba(255,136,0,.18), rgba(255,136,0,.04));
+    border: 1px solid rgba(255,136,0,.25);
+    border-radius: 18px;
+    margin: 36px auto 0;
+    max-width: 1100px;
+    padding: 44px 30px;
+    text-align: center;
+}
+
+.plus-section h2 {
+    color: var(--ow-copy);
+    font-size: clamp(2rem, 4vw, 2.4rem);
+    margin-bottom: 14px;
+}
+
+.plus-section p {
+    color: var(--ow-copy);
+    margin: 0 auto;
+    max-width: 760px;
+}
+
+.steps-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-top: 18px;
+}
+
+.step-card {
+    background: rgba(16, 43, 61, .82);
+    border: 1px solid var(--ow-line);
+    border-radius: 16px;
+    padding: 22px 20px;
+}
+
+.step-card .number {
+    background: rgba(255, 136, 0, .14);
+    border: 1px solid rgba(255, 136, 0, .28);
+    border-radius: 999px;
+    color: var(--ow-orange);
+    display: inline-flex;
+    font-weight: 700;
+    height: 34px;
+    margin-bottom: 12px;
+    place-items: center;
+    width: 34px;
+}
+
+.step-card h3 {
+    color: var(--ow-copy);
+    margin-bottom: 8px;
+}
+
+.step-card p {
+    color: var(--ow-muted);
+    line-height: 1.7;
+}
+
+.add-beacon {
+    background: rgba(16, 43, 61, .82);
+    border: 1px solid var(--ow-line);
+    border-radius: 18px;
+    margin: 36px auto 0;
+    max-width: 1100px;
+    padding: 56px 30px;
+    text-align: center;
+}
+
+.add-beacon h2 {
+    color: var(--ow-copy);
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    margin-bottom: 12px;
+}
+
+.add-beacon p {
+    color: var(--ow-muted);
+    margin: 0 auto 24px;
+    max-width: 680px;
+}
+
+footer {
+    border-top: 1px solid var(--ow-line);
+    color: var(--ow-muted);
+    font-size: 13px;
+    margin: 54px auto 0;
+    max-width: 1100px;
+    padding: 20px 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 22px;
+}
+
+.footer-links a {
+    color: var(--ow-muted);
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: var(--ow-copy);
+}
+
+@media (max-width: 860px) {
+    .hero-inner {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-shell {
+        padding-left: 18px;
+        padding-right: 18px;
     }
 
-    .main-content{
-        margin-left:0;
-        padding:20px;
+    .hero {
+        padding: 52px 24px;
     }
 
-    .hero,
-    .plus-section,
-    .add-beacon{
-        padding:35px 25px;
+    .links {
+        gap: 10px 14px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
     }
 
-    .hero h1{
-        font-size:2.2rem;
+    .nav {
+        height: auto;
+        min-height: 72px;
+        padding: 16px 0;
+    }
+
+    footer {
+        display: block;
     }
 }
 </style>
+
 <link rel="stylesheet" href="../assets/site.css">
 </head>
 
 <body>
 
-<header><div class="container"><nav class="nav"><a class="logo" href="../">Ocean<span>works</span></a><div class="links"><a href="../">Home</a><a href="../ocean-one/">Ocean One</a><a href="https://discord.gg/UdAKT57TK9" target="_blank" rel="noopener noreferrer">Discord</a><a class="auth-link" href="../ocean-one/owner-panel/">Sign in</a></div></nav></div></header>
-
-<div class="top-bar"></div>
-
-<div class="app-layout">
-
-    <sidebar>
-
-        <div class="sidebar-brand">
-            Ocean <span>Beacon</span>
-        </div>
-
-          <ul class="sidebar-menu">
-          
-              <li>
-                  <a href="https://ocean-works.github.io/">
-                      Home
-                  </a>
-              </li>
-          
-              <li>
-                  <a href="../ocean-one/">
-                      Ocean One
-                  </a>
-              </li>
-          
-              <li>
-                  <a href="https://ocean-works.github.io/beacon">
-                      Beacon
-                  </a>
-              </li>
-          
-              <li>
-                  <a href="https://discord.gg/UdAKT57TK9" target="_blank">
-                      Discord Server
-                  </a>
-              </li>
-
-              <li>
-                  <a href="../ocean-one/owner-panel/">Sign in</a>
-              </li>
-          
-          </ul>
-
-        <div class="sidebar-footer">
-            © 2026 Oceanworks
-        </div>
-
-    </sidebar>
-
-    <div class="main-content">
-
-        <div class="hero">
-
-            <h1>Beacon</h1>
-
-            <p>
-                Secure. Private. Professional.
-                Beacon is a bodycam solution built for Discord and Roblox
-                communities that need reliable recording, secure storage,
-                and complete control over sensitive content.
-            </p>
-
-            <div class="cta-buttons">
-                <a href="#learn-more" class="btn btn-primary">
-                    Learn More
-                </a>
-
-                <a href="https://discord.gg/UdAKT57TK9" class="btn btn-secondary" target="_blank">
-                    Join Discord
-                </a>
+<header>
+    <div class="container">
+        <nav class="nav">
+            <a class="logo" href="../">Ocean<span>works</span></a>
+            <div class="links">
+                <a href="../">Home</a>
+                <a href="../ocean-one/">Ocean One</a>
+                <a href="../beacon/">Beacon</a>
+                <a href="https://discord.gg/UdAKT57TK9" target="_blank" rel="noopener noreferrer">Discord</a>
+                <a class="auth-link" href="../ocean-one/owner-panel/">Sign in</a>
             </div>
+        </nav>
+    </div>
+</header>
 
-        </div>
-
-        <section class="section" id="features">
-
-            <h2 class="section-title">Features</h2>
-
-            <p class="section-subtitle">
-                Built for communities that require privacy, accountability,
-                and secure record management.
-            </p>
-
-            <div class="features-grid">
-
-                <div class="feature-card">
-                    <h3>🎥 Bodycam Platform</h3>
-                    <p>
-                        Record and manage bodycam footage through a modern
-                        platform designed for Discord and Roblox communities.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>🔒 Private by Default</h3>
-                    <p>
-                        Your recordings and information remain private.
-                        Access is limited to authorized personnel only.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>🛡️ Secure Storage</h3>
-                    <p>
-                        Recordings are protected through a security-focused
-                        system built for reliability and confidence.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>⚡ Fast Review Access</h3>
-                    <p>
-                        Quickly find and review recordings whenever they
-                        are needed for administrative purposes.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>📋 Organized Records</h3>
-                    <p>
-                        Maintain a structured archive of recordings and
-                        information for your organization's needs.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>🌐 Unified Experience</h3>
-                    <p>
-                        Access your content through a streamlined platform
-                        that makes management simple and efficient.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>✅ Access Control</h3>
-                    <p>
-                        Ensure only approved individuals can view and
-                        manage sensitive recordings and information.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>🚀 Constant Improvements</h3>
-                    <p>
-                        Regular updates continue to improve security,
-                        performance, and overall user experience.
-                    </p>
-                </div>
-
-                <div class="feature-card">
-                    <h3>🏢 Community Focused</h3>
-                    <p>
-                        Designed for professional roleplay organizations,
-                        departments, and management teams.
-                    </p>
-                </div>
-
-            </div>
-
-        </section>
-
-        <section class="section">
-
-            <div class="plus-section">
-
-                <h2>🔐 Privacy & Security</h2>
-
-                <p>
-                    Privacy is at the core of Beacon. Your recordings,
-                    information, and data are intended only for you and
-                    those you authorize. Beacon is designed to provide
-                    a secure experience that prioritizes confidentiality,
-                    trust, and protection of your organization's content.
-                </p>
-
-            </div>
-
-        </section>
-
-        <section class="section" id="learn-more">
-
-            <div class="add-beacon">
-
-                <h2>Ready to Use Beacon?</h2>
-
-                <p>
-                    Join organizations using Beacon to maintain secure,
-                    professional, and private bodycam record management for
-                    their communities.
-                </p>
-
-                <a href="https://discord.gg/UdAKT57TK9" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-                    Get Beacon
-                </a>
-
-            </div>
-
-        </section>
-
-        <footer>
-
+<div class="main-shell">
+    <div class="hero">
+        <div class="hero-inner">
             <div>
-                © 2026 Oceanworks. All rights reserved.
+                <div class="section-tag">Emergency operations platform</div>
+                <h1>Beacon CAD, bodycam, and 911 dispatch.</h1>
+                <p>
+                    Built for modern public safety, security, and emergency-response communities, Beacon brings together CAD workflows, live dispatch coordination, evidence capture, and bodycam oversight into one clear operational system.
+                </p>
+                <div class="cta-buttons">
+                    <a href="#learn-more" class="btn btn-primary">Learn More</a>
+                    <a href="https://discord.gg/UdAKT57TK9" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Join Discord</a>
+                </div>
             </div>
 
-            <div class="footer-links">
-
-                <a href="/privacypolicy/">
-                    Privacy Policy
-                </a>
-
-                <a href="/tos/">
-                    Terms of Service
-                </a>
-
+            <div class="hero-panel">
+                <div class="status-card">
+                    <div class="status-head">
+                        <strong>Live operations</strong>
+                        <span class="status-dot" aria-label="Live"></span>
+                    </div>
+                    <h3>Dispatch network synced</h3>
+                    <p>Unit status, case flow, and live incident updates are coordinated in real time.</p>
+                </div>
+                <div class="metric-row">
+                    <div class="metric">
+                        <strong>24/7</strong>
+                        <span>Monitoring</span>
+                    </div>
+                    <div class="metric">
+                        <strong>911</strong>
+                        <span>Dispatch</span>
+                    </div>
+                    <div class="metric">
+                        <strong>Live</strong>
+                        <span>Bodycam</span>
+                    </div>
+                    <div class="metric">
+                        <strong>CAD</strong>
+                        <span>Workflow</span>
+                    </div>
+                </div>
             </div>
-
-        </footer>
-
+        </div>
     </div>
 
+    <section class="section" id="features">
+        <div class="section-header">
+            <h2>Designed for rapid response</h2>
+            <p>Beacon keeps dispatch, enforcement, and evidence management aligned from the first call to final case review.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>CAD command center</h3>
+                <p>Manage active incidents, unit assignments, and response priorities from a single operational workspace built for speed and clarity.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Bodycam capture</h3>
+                <p>Record and organize bodycam footage with controlled access, clear metadata, and secure storage for evidence review.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>911 dispatching</h3>
+                <p>Coordinate incoming emergency reports, dispatch assignments, and response statuses in real time without losing context.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Case file continuity</h3>
+                <p>Link calls, bodycam footage, notes, and incident records so each case stays consistent from intake to conclusion.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Unit visibility</h3>
+                <p>Track active units, locations, availability, and task updates to ensure response teams stay aligned under pressure.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Evidence integrity</h3>
+                <p>Protect sensitive recordings and records with a system designed around access control, professionalism, and secure administration.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Administrative oversight</h3>
+                <p>Give leadership and command staff the visibility needed to review operations, monitor workflows, and maintain accountability.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Private-by-default design</h3>
+                <p>Only authorized personnel can access operational data, supporting privacy, trust, and secure handling of sensitive content.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Operational readiness</h3>
+                <p>Built to support fast-moving teams that need dependable coordination, record retention, and a clear command structure.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="plus-section">
+        <h2>Built for accountability and trust</h2>
+        <p>
+            Beacon is designed to support professional dispatch operations and evidence management with the clarity, structure, and security needed to protect staff, communities, and case records alike.
+        </p>
+    </div>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>How it works</h2>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="number">1</div>
+                <h3>Receive the call</h3>
+                <p>Take the initial report, classify the incident, and route the response through the CAD workflow.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="number">2</div>
+                <h3>Dispatch and monitor</h3>
+                <p>Assign units, track their status, and keep command updated as the situation evolves.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="number">3</div>
+                <h3>Capture and review</h3>
+                <p>Record evidence with bodycam integration, review the case, and maintain a secure record for follow-up.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="add-beacon" id="learn-more">
+        <h2>Ready for a modern emergency operations stack?</h2>
+        <p>
+            Beacon brings CAD, bodycam management, and 911 dispatch workflows into one structured platform designed for clarity, speed, and accountability.
+        </p>
+        <a href="https://discord.gg/UdAKT57TK9" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Get Beacon</a>
+    </div>
+
+    <footer>
+        <div>© 2026 Oceanworks. All rights reserved.</div>
+        <div class="footer-links">
+            <a href="/privacypolicy/">Privacy Policy</a>
+            <a href="/tos/">Terms of Service</a>
+        </div>
+    </footer>
 </div>
 
 </body>

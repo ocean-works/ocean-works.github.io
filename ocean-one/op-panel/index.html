@@ -33,6 +33,91 @@
         .terminal-form input:focus, .op-select:focus { border-color: var(--op-blue); outline: none; }
         .op-button { background: var(--op-blue); border: 0; border-radius: 6px; color: #07101c; cursor: pointer; font-weight: 700; padding: 10px 16px; }
         .op-button:disabled { cursor: not-allowed; opacity: .5; }
+        .command-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .command-chip { background: #0b1a2b; border: 1px solid var(--op-line); border-radius: 999px; color: #c9daed; cursor: pointer; padding: 7px 11px; }
+        .command-chip:hover, .command-chip:focus-visible { border-color: var(--op-blue); color: white; outline: none; }
+        .command-modal { align-items: center; background: rgba(1, 5, 10, .76); display: flex; inset: 0; justify-content: center; padding: 20px; position: fixed; z-index: 10; }
+        .command-dialog { background: linear-gradient(145deg, #102038, #08111d); border: 1px solid var(--op-line); border-radius: 10px; box-shadow: 0 18px 70px rgba(0, 0, 0, .45); max-width: 560px; padding: 24px; width: 100%; }
+        .command-dialog h2 { margin: 0 0 6px; }
+        .command-dialog p { color: var(--op-muted); margin: 0 0 18px; }
+        .command-field { display: grid; gap: 7px; margin-top: 14px; }
+        .command-field label { color: #c9daed; font-size: .82rem; font-weight: 700; }
+        .command-field input, .command-field select, .command-field textarea { background: #091321; border: 1px solid var(--op-line); border-radius: 6px; color: #eef5ff; font: inherit; padding: 11px 12px; width: 100%; }
+        .command-field textarea { min-height: 110px; resize: vertical; }
+        .command-field input:focus, .command-field select:focus, .command-field textarea:focus { border-color: var(--op-blue); outline: none; }
+        .command-choice { align-items: center; color: #c9daed; display: flex; gap: 9px; margin-top: 16px; }
+        .command-choice input { accent-color: var(--op-blue); }
+        .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .op-button.secondary { background: transparent; border: 1px solid var(--op-line); color: #c9daed; }
+        .discord-client { background: #313338; border: 1px solid #1f2023; border-radius: 12px; box-shadow: 0 24px 80px rgba(0, 0, 0, .38); display: grid; grid-template-columns: 72px 240px minmax(0, 1fr) 210px; height: min(760px, calc(100vh - 170px)); min-height: 560px; overflow: hidden; }
+        .server-rail { background: #1e1f22; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding: 14px 12px; }
+        .server-rail::after { background: #3f4147; content: ''; height: 1px; margin: 2px 8px; order: 0; }
+        .server-button { align-items: center; background: #313338; border: 0; border-radius: 50%; color: #dbdee1; cursor: pointer; display: flex; flex: 0 0 48px; font-size: .75rem; font-weight: 700; justify-content: center; margin: 0 auto; overflow: hidden; position: relative; transition: border-radius .18s ease, background .18s ease; width: 48px; }
+        .server-button:hover, .server-button.selected { background: #5865f2; border-radius: 16px; color: white; }
+        .server-button.selected::before { background: white; border-radius: 0 4px 4px 0; content: ''; height: 32px; left: -12px; position: absolute; width: 4px; }
+        .server-button.home { background: #5865f2; font-size: .62rem; letter-spacing: .04em; }
+        .channel-sidebar { background: #2b2d31; display: flex; flex-direction: column; min-width: 0; }
+        .client-server-header { align-items: center; border-bottom: 1px solid #1f2023; color: #f2f3f5; display: flex; font-weight: 700; justify-content: space-between; min-height: 52px; padding: 0 16px; }
+        .client-server-header button, .icon-button { background: transparent; border: 0; color: #b5bac1; cursor: pointer; font-size: 1rem; }
+        .client-server-header button:hover, .icon-button:hover { color: white; }
+        .channel-scroll { flex: 1; overflow: auto; padding: 16px 8px; }
+        .channel-heading { align-items: center; color: #949ba4; display: flex; font-size: .68rem; font-weight: 700; justify-content: space-between; letter-spacing: .08em; margin: 12px 8px 5px; text-transform: uppercase; }
+        .channel-heading button { background: transparent; border: 0; color: #949ba4; cursor: pointer; font-size: 1rem; }
+        .channel-item, .dm-item { align-items: center; background: transparent; border: 0; border-radius: 4px; color: #949ba4; cursor: pointer; display: flex; gap: 8px; margin: 1px 0; padding: 7px 8px; text-align: left; width: 100%; }
+        .channel-item:hover, .channel-item.selected, .dm-item:hover, .dm-item.selected { background: #3f4147; color: #f2f3f5; }
+        .channel-icon { color: #949ba4; font-size: 1.1rem; font-weight: 400; }
+        .dm-avatar { align-items: center; background: #5865f2; border-radius: 50%; color: white; display: flex; flex: 0 0 28px; font-size: .7rem; height: 28px; justify-content: center; width: 28px; }
+        .client-user { align-items: center; background: #232428; display: flex; gap: 8px; min-height: 52px; padding: 8px; }
+        .client-user-avatar { align-items: center; background: #23a559; border-radius: 50%; color: white; display: flex; font-size: .7rem; height: 30px; justify-content: center; width: 30px; }
+        .client-user-name { color: #f2f3f5; font-size: .76rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .client-user-state { color: #949ba4; font-size: .65rem; }
+        .chat-pane { background: #313338; display: flex; flex-direction: column; min-width: 0; }
+        .chat-header { align-items: center; border-bottom: 1px solid #26272b; display: flex; gap: 10px; min-height: 52px; padding: 0 18px; }
+        .chat-header h2 { color: #f2f3f5; font-size: 1rem; margin: 0; }
+        .chat-header p { color: #949ba4; font-size: .78rem; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .chat-header .header-tools { display: flex; gap: 12px; margin-left: auto; }
+        .message-list { flex: 1; overflow: auto; padding: 20px 18px; }
+        .welcome-message { border-bottom: 1px solid #3f4147; margin-bottom: 18px; padding: 20px 0; }
+        .welcome-message h2 { color: #f2f3f5; font-size: 1.55rem; margin: 0 0 6px; }
+        .welcome-message p { color: #b5bac1; margin: 0; }
+        .message { display: grid; gap: 12px; grid-template-columns: 40px minmax(0, 1fr); padding: 8px 0; position: relative; }
+        .message:hover { background: rgba(255, 255, 255, .025); }
+        .message-avatar { align-items: center; background: #5865f2; border-radius: 50%; color: white; display: flex; font-weight: 700; height: 40px; justify-content: center; width: 40px; }
+        .message-meta { align-items: baseline; display: flex; gap: 8px; }
+        .message-author { color: #f2f3f5; font-size: .9rem; font-weight: 700; }
+        .message-time { color: #949ba4; font-size: .68rem; }
+        .message-body { color: #dbdee1; font-size: .9rem; line-height: 1.5; white-space: pre-wrap; }
+        .message-actions { display: none; gap: 4px; position: absolute; right: 8px; top: 0; }
+        .message:hover .message-actions { display: flex; }
+        .message-action { background: #2b2d31; border: 1px solid #1f2023; border-radius: 4px; color: #b5bac1; cursor: pointer; padding: 5px 7px; }
+        .message-action:hover { color: white; }
+        .reply-preview { border-left: 2px solid #5865f2; color: #b5bac1; font-size: .75rem; margin-bottom: 4px; padding-left: 7px; }
+        .composer-wrap { padding: 0 18px 18px; }
+        .reply-bar { align-items: center; background: #2b2d31; border-radius: 6px 6px 0 0; color: #b5bac1; display: flex; font-size: .75rem; justify-content: space-between; padding: 8px 12px; }
+        .reply-bar strong { color: #f2f3f5; }
+        .composer { align-items: center; background: #383a40; border-radius: 8px; display: flex; gap: 10px; min-height: 48px; padding: 0 12px; }
+        .composer input { background: transparent; border: 0; color: #dbdee1; flex: 1; font: inherit; min-width: 0; outline: 0; }
+        .composer input::placeholder { color: #949ba4; }
+        .member-sidebar { background: #2b2d31; border-left: 1px solid #26272b; overflow: auto; padding: 20px 10px; }
+        .member-heading { color: #949ba4; font-size: .68rem; font-weight: 700; letter-spacing: .08em; margin: 4px 8px 10px; text-transform: uppercase; }
+        .member { align-items: center; border-radius: 4px; color: #b5bac1; display: flex; gap: 9px; padding: 6px 8px; }
+        .member:hover { background: #3f4147; color: #f2f3f5; }
+        .member-avatar { align-items: center; background: #4e5058; border-radius: 50%; color: white; display: flex; font-size: .7rem; height: 28px; justify-content: center; width: 28px; }
+        .client-empty { color: #949ba4; font-size: .8rem; padding: 16px 8px; }
+        .blank-client body { background: #313338 !important; }
+        .blank-client header { display: none; }
+        .blank-client .op-shell { max-width: none; padding: 0; }
+        .blank-client .discord-client { border: 0; border-radius: 0; height: 100vh; min-height: 100vh; }
+        .dev-banner { background: #f0b232; color: #211a08; font-size: .75rem; font-weight: 700; padding: 7px 14px; text-align: center; }
+        .client-launcher { align-items: center; display: flex; flex-direction: column; gap: 14px; margin: 110px auto; max-width: 520px; padding: 34px; text-align: center; }
+        .client-launcher h1 { margin: 0; }
+        .client-launcher p { color: var(--op-muted); margin: 0; }
+        .server-rail .guild-list { display: contents; }
+        .server-rail .guild-option { background: #313338; border: 0; border-radius: 50%; color: #dbdee1; display: flex; flex: 0 0 48px; font-size: .75rem; font-weight: 700; justify-content: center; margin: 0 auto; min-height: 48px; overflow: hidden; padding: 0; text-align: center; transition: border-radius .18s ease, background .18s ease; width: 48px; }
+        .server-rail .guild-option:hover, .server-rail .guild-option.selected { background: #5865f2; border-color: transparent; border-radius: 16px; color: white; transform: none; }
+        .sr-only { height: 1px; margin: -1px; overflow: hidden; position: absolute; width: 1px; clip: rect(0, 0, 0, 0); }
+        @media (max-width: 900px) { .discord-client { grid-template-columns: 64px 210px minmax(0, 1fr); } .member-sidebar { display: none; } }
+        @media (max-width: 620px) { .discord-client { grid-template-columns: 58px minmax(0, 1fr); } .channel-sidebar { display: none; } .server-rail { padding: 12px 8px; } .message-list { padding: 12px; } .composer-wrap { padding: 0 12px 12px; } }
         .guild-list { display: grid; gap: 8px; max-height: 230px; overflow: auto; }
         .guild-option { background: #091321; border: 1px solid var(--op-line); border-radius: 6px; color: #c9daed; cursor: pointer; padding: 12px; text-align: left; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
         .guild-option:hover, .guild-option.selected { background: #10243a; border-color: var(--op-blue); color: white; transform: translateX(3px); }
@@ -71,12 +156,47 @@
         </section>
 
         <section id="panel-view" class="hidden">
-            <div class="op-header"><div><div class="op-kicker">Ocean One / Operations</div><h1>Community overview</h1><p id="selected-guild-label">Select a guild to begin.</p></div><div class="op-user"><img id="operator-avatar" alt=""><span id="operator-name"></span></div></div>
-            <div class="op-grid"><article class="stat-card"><div class="stat-label">Members</div><div class="stat-value" id="stat-members">--</div></article><article class="stat-card"><div class="stat-label">Guilds</div><div class="stat-value" id="stat-guilds">--</div></article><article class="stat-card"><div class="stat-label">Security state</div><div class="stat-value" id="stat-security">Checking</div></article></div>
-            <div class="op-layout"><section class="op-panel"><h2>Command terminal</h2><p class="op-panel-intro">Send an operator command to the selected guild.</p><div class="terminal"><div id="terminal-output" class="terminal-output">Ocean One operator console ready.
-Select a guild, then enter a command.</div><form id="command-form" class="terminal-form"><input id="command-input" autocomplete="off" placeholder="status, announce, reload..." disabled><button class="op-button" type="submit" disabled>Run</button></form></div></section><aside class="op-panel"><h2>Target guild</h2><p class="op-panel-intro">Servers where the bot is installed are shown.</p><div id="guild-list" class="guild-list"><div class="op-panel-intro">Loading bot servers...</div></div></aside></div>
+            <div id="dev-banner" class="dev-banner hidden">Local mock mode: no Discord or operator backend requests are being made.</div>
+            <section id="operator-dashboard">
+                <div class="op-header"><div><div class="op-kicker">Ocean One / Operations</div><h1>Community overview</h1><p id="selected-guild-label">Select a guild to begin.</p></div><div class="op-user"><img id="operator-avatar" alt=""><span id="operator-name"></span></div></div>
+                <div class="op-grid"><article class="stat-card"><div class="stat-label">Members</div><div class="stat-value" id="stat-members">--</div></article><article class="stat-card"><div class="stat-label">Guilds</div><div class="stat-value" id="stat-guilds">--</div></article><article class="stat-card"><div class="stat-label">Security state</div><div class="stat-value" id="stat-security">Checking</div></article></div>
+                <div class="op-layout"><section class="op-panel"><h2>Command terminal</h2><p class="op-panel-intro">Send an operator command to the selected guild.</p><div id="command-actions" class="command-actions"><button class="command-chip" type="button" data-command="status" disabled>Status</button><button class="command-chip" type="button" data-command="help" disabled>Help</button><button class="command-chip" type="button" data-command="ping" disabled>Ping</button><button class="command-chip" type="button" data-command="info" disabled>Server info</button><button class="command-chip" type="button" data-command="reload" disabled>Reload</button><button class="command-chip" type="button" data-command="announce" disabled>Announce...</button><button class="command-chip" type="button" data-command="discord-client" disabled>Discord client</button><button class="command-chip" type="button" data-command="clear" disabled>Clear console</button></div><div class="terminal"><div id="terminal-output" class="terminal-output">Ocean One operator console ready.
+Select a guild, then enter a command.</div><form id="command-form" class="terminal-form"><input id="command-input" autocomplete="off" placeholder="status, announce, discord-client..." disabled><button class="op-button" type="submit" disabled>Run</button></form></div></section><aside class="op-panel"><h2>Target guild</h2><p class="op-panel-intro">Servers where the bot is installed are shown.</p><div id="operator-guild-list" class="guild-list"><div class="op-panel-intro">Loading bot servers...</div></div></aside></div>
+            </section>
+            <div id="discord-client" class="discord-client hidden">
+                <aside class="server-rail" aria-label="Servers"><button id="direct-messages-button" class="server-button home selected" type="button" title="Open direct messages">DM</button><div id="guild-list" class="guild-list"><div class="client-empty">Loading servers...</div></div><button class="server-button" type="button" title="Add server">+</button></aside>
+                <aside class="channel-sidebar">
+                    <div class="client-server-header"><span id="client-server-name">Direct messages</span><button type="button" title="Server menu">⌄</button></div>
+                    <div class="channel-scroll">
+                        <div class="channel-heading">Direct messages <button type="button" title="New direct message">+</button></div>
+                        <button class="dm-item selected" type="button"><span class="dm-avatar">O1</span><span>Ocean One Bot</span></button>
+                        <div class="channel-heading">Text channels <button type="button" title="Create channel">+</button></div>
+                        <div id="client-channel-list"><button class="channel-item selected" type="button" data-channel="general"><span class="channel-icon">#</span><span>general</span></button><button class="channel-item" type="button" data-channel="announcements"><span class="channel-icon">#</span><span>announcements</span></button><button class="channel-item" type="button" data-channel="logs"><span class="channel-icon">#</span><span>logs</span></button></div>
+                        <div class="channel-heading">Voice channels <button type="button" title="Create voice channel">+</button></div>
+                        <button class="channel-item" type="button"><span class="channel-icon">◖</span><span>Lobby</span></button>
+                    </div>
+                    <div class="client-user"><span id="client-user-avatar" class="client-user-avatar">O1</span><div><div id="client-user-name" class="client-user-name">Ocean One Bot</div><div class="client-user-state">Bot · Online</div></div><button class="icon-button" type="button" title="Bot settings">⚙</button></div>
+                </aside>
+                <section class="chat-pane">
+                    <header class="chat-header"><span class="channel-icon">#</span><div><h2 id="client-channel-name">general</h2><p id="client-channel-topic">Ocean One community conversation</p></div><div class="header-tools"><button class="icon-button" type="button" title="Search">⌕</button><button class="icon-button" type="button" title="Pinned messages">⌑</button><button class="icon-button" type="button" title="Members">♙</button><button id="open-blank-client" class="icon-button" type="button" title="Open in a blank tab">↗</button></div></header>
+                    <div id="message-list" class="message-list"><div class="welcome-message"><h2>Welcome to <span id="welcome-channel">#general</span></h2><p>This is the beginning of this channel.</p></div><article class="message"><div class="message-avatar">O</div><div><div class="message-meta"><span class="message-author">Ocean One</span><span class="message-time">Today at 12:00 PM</span></div><div class="message-body">Welcome to the Ocean One operator client. Select a server and channel to get started.</div><div class="message-actions"><button class="message-action" type="button" data-reply="Ocean One">Reply</button><button class="message-action" type="button" title="React">☺</button><button class="message-action" type="button" title="More">•••</button></div></div></article><div id="client-message-empty" class="client-empty hidden">No messages are available for this channel yet.</div></div>
+                    <div class="composer-wrap"><div id="reply-bar" class="reply-bar hidden"><span>Replying to <strong id="reply-author"></strong></span><button id="cancel-reply" class="icon-button" type="button" title="Cancel reply">×</button></div><form id="client-composer" class="composer"><button class="icon-button" type="button" title="Add attachment">＋</button><input id="client-message-input" autocomplete="off" placeholder="Message #general"><button class="icon-button" type="button" title="Add emoji">☺</button><button class="icon-button" type="submit" title="Send message">➤</button></form></div>
+                </section>
+                <aside class="member-sidebar"><div class="member-heading">Online - <span id="client-member-count">0</span></div><div id="client-member-list"><div class="member"><span class="member-avatar">O</span><span>Ocean One</span></div><div class="member"><span class="member-avatar">OP</span><span id="client-member-operator">Operator</span></div></div><div class="member-heading">Offline - 0</div></aside>
+            </div>
         </section>
     </main>
+    <div id="announce-modal" class="command-modal hidden" role="dialog" aria-modal="true" aria-labelledby="announce-title">
+        <form id="announce-form" class="command-dialog">
+            <h2 id="announce-title">Build announcement</h2>
+            <p>Choose a channel, then write the message to send.</p>
+            <div class="command-field"><label for="announce-channel">Channel</label><select id="announce-channel" required><option value="">Loading channels...</option></select></div>
+            <label class="command-choice"><input id="announce-reply-toggle" type="checkbox"> Reply to an existing message</label>
+            <div id="announce-reply-field" class="command-field hidden"><label for="announce-reply-id">Message ID</label><input id="announce-reply-id" inputmode="numeric" placeholder="Paste the message ID to reply to"></div>
+            <div class="command-field"><label for="announce-message">Message</label><textarea id="announce-message" required placeholder="Write your announcement..."></textarea></div>
+            <div class="dialog-actions"><button id="announce-cancel" class="op-button secondary" type="button">Cancel</button><button class="op-button" type="submit">Send announcement</button></div>
+        </form>
+    </div>
     <script src="../../assets/auth.js"></script>
     <script>
         (() => {
@@ -91,6 +211,18 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             const output = document.getElementById('terminal-output');
             const commandInput = document.getElementById('command-input');
             const commandButton = document.querySelector('#command-form button');
+            const commandChips = document.querySelectorAll('.command-chip');
+            const announceModal = document.getElementById('announce-modal');
+            const announceForm = document.getElementById('announce-form');
+            const announceChannel = document.getElementById('announce-channel');
+            const announceReplyToggle = document.getElementById('announce-reply-toggle');
+            const announceReplyField = document.getElementById('announce-reply-field');
+            const announceReplyId = document.getElementById('announce-reply-id');
+            const announceMessage = document.getElementById('announce-message');
+            const localHostnames = ['localhost', '127.0.0.1', '0.0.0.0', '::1', '[::1]'];
+            const isLocalDevHost = localHostnames.includes(window.location.hostname) || window.location.hostname.endsWith('.localhost') || window.location.hostname.endsWith('.app.github.dev') || window.location.hostname.endsWith('.github.dev') || window.location.hostname.endsWith('.githubpreview.dev');
+            const localDevMode = isLocalDevHost && new URLSearchParams(window.location.search).get('dev') === 'kermit.txt';
+            const clientMode = new URLSearchParams(window.location.search).get('client') === '1';
             let token = null;
             let selectedGuild = null;
             let consoleCursor = 0;
@@ -126,6 +258,68 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
             async function securityRequest(path, options = {}) {
                 return operatorRequest(`security/${path}`, options);
             }
+            function setCommandAvailability(enabled) { commandInput.disabled = !enabled; commandButton.disabled = !enabled; commandChips.forEach((chip) => { chip.disabled = !enabled; }); }
+            async function openAnnounce() {
+                if (!selectedGuild) return;
+                announceModal.classList.remove('hidden');
+                announceChannel.innerHTML = '<option value="">Loading channels...</option>';
+                if (localDevMode) {
+                    announceChannel.innerHTML = ['general', 'announcements', 'logs'].map((channel) => `<option value="${channel}">#${channel}</option>`).join('');
+                    announceMessage.focus();
+                    return;
+                }
+                try {
+                    const data = await operatorRequest(`guilds/${encodeURIComponent(selectedGuild.id)}/channels`);
+                    const channels = Array.isArray(data.channels) ? data.channels : Array.isArray(data) ? data : [];
+                    announceChannel.innerHTML = channels.length ? channels.map((channel) => `<option value="${channel.id}">#${channel.name}</option>`).join('') : '<option value="">No channels available</option>';
+                } catch (error) {
+                    announceChannel.innerHTML = '<option value="">Channel list unavailable</option>';
+                    print(`Channel list unavailable: ${error.message}`);
+                }
+                announceMessage.focus();
+            }
+            function closeAnnounce() { announceModal.classList.add('hidden'); announceForm.reset(); announceReplyField.classList.add('hidden'); }
+            async function sendCommand(command) {
+                if (!command || !selectedGuild) return;
+                print(`> ${command}`);
+                if (localDevMode) { print(`[mock] ${command} accepted locally.`); return; }
+                try { const data = await operatorRequest(`guilds/${encodeURIComponent(selectedGuild.id)}/command`, { method: 'POST', body: JSON.stringify({ command }) }); print(data.message || 'Command accepted.'); } catch (error) { print(`Error: ${error.message}`); }
+            }
+            function setClientChannel(name) {
+                document.getElementById('client-channel-name').textContent = name;
+                document.getElementById('client-channel-topic').textContent = `${selectedGuild ? selectedGuild.name : 'Ocean One'} / ${name}`;
+                document.getElementById('welcome-channel').textContent = `#${name}`;
+                document.getElementById('client-message-input').placeholder = `Message #${name}`;
+            }
+            function showDirectMessages() { document.querySelectorAll('.server-button').forEach((item) => item.classList.remove('selected')); document.getElementById('direct-messages-button').classList.add('selected'); document.getElementById('client-server-name').textContent = 'Direct messages'; setClientChannel('Ocean One'); }
+            function showClientSurface() { document.getElementById('operator-dashboard').classList.add('hidden'); document.getElementById('discord-client').classList.remove('hidden'); }
+            function openBlankClient() { const blankTab = window.open('about:blank', '_blank'); if (!blankTab) return; const devQuery = localDevMode ? '&dev=kermit.txt' : ''; const clientUrl = `${window.location.origin}${window.location.pathname}?client=1${devQuery}`; blankTab.document.write(`<!doctype html><title>Ocean One</title><style>html,body,iframe{border:0;height:100%;margin:0;width:100%;overflow:hidden;background:#313338}iframe{display:block}</style><iframe src="${clientUrl}" title="Ocean One client"></iframe>`); blankTab.document.close(); }
+            function appendClientMessage(author, message, replyAuthor = '') {
+                const item = document.createElement('article');
+                item.className = 'message';
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.textContent = author.slice(0, 2).toUpperCase();
+                const content = document.createElement('div');
+                const meta = document.createElement('div');
+                meta.className = 'message-meta';
+                meta.innerHTML = `<span class="message-author"></span><span class="message-time">Just now</span>`;
+                meta.querySelector('.message-author').textContent = author;
+                const body = document.createElement('div');
+                body.className = 'message-body';
+                if (replyAuthor) { const preview = document.createElement('div'); preview.className = 'reply-preview'; preview.textContent = `Replying to ${replyAuthor}`; content.appendChild(preview); }
+                body.textContent = message;
+                const actions = document.createElement('div');
+                actions.className = 'message-actions';
+                actions.innerHTML = '<button class="message-action" type="button" data-reply=""></button><button class="message-action" type="button" title="React">☺</button><button class="message-action" type="button" title="More">•••</button>';
+                actions.querySelector('[data-reply]').textContent = 'Reply';
+                actions.querySelector('[data-reply]').dataset.reply = author;
+                content.append(meta, body, actions);
+                item.append(avatar, content);
+                document.getElementById('message-list').appendChild(item);
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            function setReply(author) { document.getElementById('reply-author').textContent = author; document.getElementById('reply-bar').classList.remove('hidden'); document.getElementById('client-message-input').focus(); }
             function syncTerminalHeight() { const list = document.getElementById('guild-list'); output.style.height = `${Math.max(175, list.clientHeight)}px`; requestAnimationFrame(() => { output.scrollTop = output.scrollHeight; }); }
             async function requireSecurityKey() {
                 try {
@@ -139,7 +333,22 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                     return false;
                 }
             }
+            function loadMockClient() {
+                const mockUser = 'Ocean One Bot';
+                const mockGuilds = [{ id: 'mock-game-center', name: 'Game Center' }, { id: 'mock-bird-meme', name: 'Bird Meme' }, { id: 'mock-top-01', name: "LoR's Top 0.1%" }];
+                document.getElementById('dev-banner').classList.remove('hidden');
+                document.getElementById('client-user-name').textContent = mockUser;
+                document.getElementById('client-member-operator').textContent = mockUser;
+                document.getElementById('client-user-avatar').textContent = 'O1';
+                loginView.classList.add('hidden'); securityView.classList.add('hidden'); panelView.classList.remove('hidden');
+                if (clientMode) showClientSurface();
+                const list = document.getElementById('operator-guild-list'); list.innerHTML = '';
+                mockGuilds.forEach((guild) => { const button = document.createElement('button'); button.className = 'guild-option'; button.type = 'button'; button.title = guild.name; button.textContent = guild.name; button.addEventListener('click', () => selectGuild(guild, button)); list.appendChild(button); });
+                setCommandAvailability(false);
+                selectGuild(mockGuilds[0], list.firstElementChild);
+            }
             async function load() {
+                if (localDevMode) { loadMockClient(); return; }
                 const saved = session();
                 if (!saved) { showError('Sign in with the authorized Discord account to continue.'); return; }
                 token = saved.token;
@@ -147,26 +356,42 @@ Select a guild, then enter a command.</div><form id="command-form" class="termin
                     const user = await discordRequest('/users/@me');
                     if (!operatorIds.includes(user.id)) { showError('This account is not authorized for operator access.'); return; }
                     document.getElementById('operator-name').textContent = user.global_name || user.username;
+                    document.getElementById('client-user-name').textContent = user.global_name || user.username;
+                    document.getElementById('client-member-operator').textContent = user.global_name || user.username;
+                    document.getElementById('client-user-avatar').textContent = (user.global_name || user.username).slice(0, 2).toUpperCase();
                     document.getElementById('operator-avatar').src = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64` : `https://cdn.discordapp.com/embed/avatars/${Number(user.id) % 5}.png`;
                     if (!(await requireSecurityKey())) return;
                     const { guilds } = await operatorRequest('guilds');
                     loginView.classList.add('hidden'); panelView.classList.remove('hidden');
+                    if (clientMode) showClientSurface();
                     await loadConsole();
                     requestAnimationFrame(() => { output.scrollTop = output.scrollHeight; });
                     consoleTimer = window.setInterval(loadConsole, 1500);
-                    const list = document.getElementById('guild-list'); list.innerHTML = '';
+                    const list = document.getElementById('operator-guild-list'); list.innerHTML = '';
                     guilds.forEach((guild) => { const button = document.createElement('button'); button.className = 'guild-option'; button.type = 'button'; button.textContent = guild.name; button.addEventListener('click', () => selectGuild(guild, button)); list.appendChild(button); });
                     if (!guilds.length) list.innerHTML = '<div class="op-panel-intro">No guilds available.</div>';
                     syncTerminalHeight();
                 } catch (error) { showError(error.name === 'TypeError' ? 'The operator backend could not be reached. Check that the bot backend is running.' : error.message); }
             }
-            function selectGuild(guild, button) { selectedGuild = guild; document.querySelectorAll('.guild-option').forEach((item) => item.classList.remove('selected')); button.classList.add('selected'); document.getElementById('selected-guild-label').textContent = guild.name; commandInput.disabled = false; commandButton.disabled = false; loadStats(); print(`Target selected: ${guild.name}`); }
-            async function loadStats() { try { const stats = await operatorRequest(`guilds/${encodeURIComponent(selectedGuild.id)}/stats`); document.getElementById('stat-members').textContent = stats.members ?? '--'; document.getElementById('stat-guilds').textContent = stats.guilds ?? stats.guildCount ?? '--'; document.getElementById('stat-security').textContent = stats.securityStatus ?? stats.security ?? 'Protected'; } catch (error) { document.getElementById('stat-security').textContent = 'Unavailable'; print(`Stats unavailable: ${error.message}`); } }
+            function selectGuild(guild, button) { selectedGuild = guild; document.querySelectorAll('.guild-option').forEach((item) => item.classList.remove('selected')); button.classList.add('selected'); document.getElementById('selected-guild-label').textContent = guild.name; document.getElementById('client-server-name').textContent = guild.name; document.getElementById('client-channel-topic').textContent = `${guild.name} / general`; setCommandAvailability(true); loadStats(); print(`Target selected: ${guild.name}`); }
+            async function loadStats() { if (localDevMode) return; try { const stats = await operatorRequest(`guilds/${encodeURIComponent(selectedGuild.id)}/stats`); document.getElementById('stat-members').textContent = stats.members ?? '--'; document.getElementById('stat-guilds').textContent = stats.guilds ?? stats.guildCount ?? '--'; document.getElementById('stat-security').textContent = stats.securityStatus ?? stats.security ?? 'Protected'; } catch (error) { document.getElementById('stat-security').textContent = 'Unavailable'; print(`Stats unavailable: ${error.message}`); } }
             async function loadConsole() { try { const data = await operatorRequest(`console?since=${consoleCursor}`); data.entries.forEach((entry) => { consoleCursor = Math.max(consoleCursor, entry.id); print(`[${entry.level}] ${entry.message}`); }); consoleCursor = Math.max(consoleCursor, data.latest || 0); output.scrollTop = output.scrollHeight; } catch (error) {} }
             window.addEventListener('resize', syncTerminalHeight);
             document.getElementById('login-button').addEventListener('click', () => window.OceanworksAuth.login());
             document.getElementById('verify-key-button').addEventListener('click', async () => { const key = document.getElementById('security-key-input').value.trim(); if (!key) { showSecurityError('Enter the security key from your Discord DM.'); return; } try { const result = await securityRequest('verify', { method: 'POST', body: JSON.stringify({ key }) }); if (result.verified === true) window.location.reload(); else showSecurityError('That security key is invalid or expired.'); } catch (error) { showSecurityError(error.message); } });
-            document.getElementById('command-form').addEventListener('submit', async (event) => { event.preventDefault(); const command = commandInput.value.trim(); if (!command || !selectedGuild) return; print(`> ${command}`); commandInput.value = ''; try { const data = await operatorRequest(`guilds/${encodeURIComponent(selectedGuild.id)}/command`, { method: 'POST', body: JSON.stringify({ command }) }); print(data.message || 'Command accepted.'); } catch (error) { print(`Error: ${error.message}`); } });
+            document.getElementById('command-form').addEventListener('submit', async (event) => { event.preventDefault(); const command = commandInput.value.trim(); commandInput.value = ''; if (command.toLowerCase() === 'announce') { openAnnounce(); return; } if (command.toLowerCase() === 'discord-client' || command.toLowerCase() === 'discord client') { openBlankClient(); return; } if (command.toLowerCase() === 'clear') { output.textContent = 'Ocean One operator console ready.'; return; } await sendCommand(command); });
+            commandChips.forEach((chip) => chip.addEventListener('click', () => { if (chip.dataset.command === 'announce') openAnnounce(); else if (chip.dataset.command === 'discord-client') openBlankClient(); else if (chip.dataset.command === 'clear') output.textContent = 'Ocean One operator console ready.'; else sendCommand(chip.dataset.command); }));
+            announceReplyToggle.addEventListener('change', () => { announceReplyField.classList.toggle('hidden', !announceReplyToggle.checked); if (announceReplyToggle.checked) announceReplyId.focus(); });
+            document.getElementById('announce-cancel').addEventListener('click', closeAnnounce);
+            announceModal.addEventListener('click', (event) => { if (event.target === announceModal) closeAnnounce(); });
+            announceForm.addEventListener('submit', async (event) => { event.preventDefault(); const channel = announceChannel.value; const message = announceMessage.value.trim(); const replyId = announceReplyToggle.checked ? announceReplyId.value.trim() : ''; if (!channel || !message || (announceReplyToggle.checked && !replyId)) return; const replyPart = replyId ? ` --reply-to ${replyId}` : ''; closeAnnounce(); await sendCommand(`announce --channel ${channel}${replyPart} ${message}`); });
+            document.querySelectorAll('.channel-item').forEach((button) => button.addEventListener('click', () => { document.querySelectorAll('.channel-item').forEach((item) => item.classList.remove('selected')); button.classList.add('selected'); setClientChannel(button.dataset.channel || button.textContent.trim()); }));
+            document.querySelectorAll('[data-reply]').forEach((button) => button.addEventListener('click', () => setReply(button.dataset.reply || 'Ocean One')));
+            document.getElementById('cancel-reply').addEventListener('click', () => document.getElementById('reply-bar').classList.add('hidden'));
+            document.getElementById('client-composer').addEventListener('submit', (event) => { event.preventDefault(); const input = document.getElementById('client-message-input'); const message = input.value.trim(); if (!message) return; const replyAuthor = document.getElementById('reply-bar').classList.contains('hidden') ? '' : document.getElementById('reply-author').textContent; appendClientMessage(document.getElementById('client-user-name').textContent || 'Operator', message, replyAuthor); input.value = ''; document.getElementById('reply-bar').classList.add('hidden'); });
+            document.getElementById('open-blank-client').addEventListener('click', openBlankClient);
+            document.getElementById('direct-messages-button').addEventListener('click', showDirectMessages);
+            if (new URLSearchParams(window.location.search).get('client') === '1') document.documentElement.classList.add('blank-client');
             load();
         })();
     </script>

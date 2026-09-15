@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ocean Utils</title>
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <a class="brand" href="/">Ocean<span>Utils</span></a>
+      <nav class="links">
+        <a href="/">Home</a>
+        <a href="/ocean-one/">Ocean One</a>
+        <a href="/beacon/">Beacon</a>
+        <a href="/ocean-utils/" class="active">Ocean Utils</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero panel">
+      <div class="hero-copy">
+        <div class="eyebrow">Oceanworks utility suite</div>
+        <h1>Powerful embed and automation builder.</h1>
+        <p>
+          Ocean Utils gives you a Discord-first toolkit for embeddable message design,
+          action-row controls, dropdown menus, reusable templates, and bot-ready payloads.
+          Everything is designed for local browser storage so your config stays here rather than inside the bot.
+        </p>
+      </div>
+      <div class="hero-card">
+        <div class="status-pill">Bot mode ready</div>
+        <div class="mini-grid">
+          <div>
+            <strong>Buttons</strong>
+            <span>Custom actions</span>
+          </div>
+          <div>
+            <strong>Dropdowns</strong>
+            <span>Selection menus</span>
+          </div>
+          <div>
+            <strong>Backups</strong>
+            <span>Templates saved</span>
+          </div>
+          <div>
+            <strong>Bot send</strong>
+            <span>Discord payload</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel login-panel" id="login-panel">
+      <div class="panel-header">
+        <h2>Connect Ocean Utils</h2>
+        <span class="pill neutral">Separate from Ocean One</span>
+      </div>
+      <form id="login-form" class="login-form">
+        <p class="helper-text">
+          Guild ID and channel ID are optional for the public/local builder. They only matter if you want to send a message directly through the bot to a specific Discord channel.
+        </p>
+        <div class="field-grid">
+          <label>
+            Bot token
+            <input id="bot-token" type="password" placeholder="Discord bot token" />
+          </label>
+          <label>
+            Guild ID (optional)
+            <input id="guild-id" type="text" placeholder="Server ID for direct sends" />
+          </label>
+          <label>
+            Channel ID (optional)
+            <input id="channel-id" type="text" placeholder="Target channel ID" />
+          </label>
+          <label>
+            Display name
+            <input id="bot-name" type="text" placeholder="Ocean Utils" />
+          </label>
+        </div>
+        <div class="actions-row">
+          <button type="submit" class="btn primary">Login to Ocean Utils</button>
+          <button type="button" id="load-demo" class="btn secondary">Load sample setup</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="workspace hidden" id="workspace-panel">
+      <aside class="sidebar panel">
+        <div class="panel-header compact">
+          <h3>Saved templates</h3>
+          <button id="new-template" class="btn tiny">New</button>
+        </div>
+        <div id="template-list" class="template-list"></div>
+      </aside>
+
+      <div class="editor-wrap">
+        <div class="panel toolbar">
+          <div class="toolbar-left">
+            <h2>Embed builder</h2>
+            <span id="active-session" class="pill success">Session active</span>
+          </div>
+          <div class="toolbar-actions">
+            <button id="save-template" class="btn primary">Save template</button>
+            <button id="export-json" class="btn secondary">Export JSON</button>
+            <button id="logout" class="btn ghost">Logout</button>
+          </div>
+        </div>
+
+        <div class="panel builder-panel">
+          <div class="field-grid two">
+            <label>
+              Embed title
+              <input id="embed-title" type="text" placeholder="Welcome to Ocean Utils" />
+            </label>
+            <label>
+              Embed color
+              <input id="embed-color" type="color" value="#ff8f70" />
+            </label>
+            <label class="full-span">
+              Description
+              <textarea id="embed-description" rows="4" placeholder="Describe the update, event, or alert..."></textarea>
+            </label>
+            <label>
+              Image URL
+              <input id="embed-image" type="text" placeholder="https://example.com/image.png" />
+            </label>
+            <label>
+              Thumbnail URL
+              <input id="embed-thumbnail" type="text" placeholder="https://example.com/thumb.png" />
+            </label>
+            <label>
+              Footer text
+              <input id="embed-footer-text" type="text" placeholder="Oceanworks • Operations" />
+            </label>
+            <label>
+              Footer icon URL
+              <input id="embed-footer-icon" type="text" placeholder="https://example.com/icon.png" />
+            </label>
+            <label>
+              Author name
+              <input id="embed-author" type="text" placeholder="Ocean Utils" />
+            </label>
+            <label>
+              Author icon URL
+              <input id="embed-author-icon" type="text" placeholder="https://example.com/avatar.png" />
+            </label>
+          </div>
+        </div>
+
+        <div class="panel component-panel">
+          <div class="panel-header compact">
+            <h3>Bot components</h3>
+            <div class="component-actions">
+              <button id="add-button" class="btn tiny">Add button</button>
+              <button id="add-select" class="btn tiny">Add dropdown</button>
+            </div>
+          </div>
+          <div id="components-list" class="components-list"></div>
+        </div>
+
+        <div class="panel preview-panel">
+          <div class="panel-header compact">
+            <h3>Discord payload preview</h3>
+            <button id="copy-json" class="btn tiny">Copy JSON</button>
+          </div>
+          <pre id="json-preview"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
